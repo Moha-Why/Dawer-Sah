@@ -106,8 +106,8 @@ export default function Navbar() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        style={{ backgroundImage: "url('/bg.png')" }}
-        className="w-full min-h-screen bg-cover bg-center bg-no-repeat flex items-center md:items-start justify-center md:justify-end"
+
+        className="w-full  bg-cover bg-center bg-no-repeat flex items-center md:items-start justify-center md:justify-end"
       >
         <motion.div
           initial={{ opacity: 0, y: 50 }}
