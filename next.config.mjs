@@ -34,6 +34,9 @@ const nextConfig = {
     // Remove optimizeCss and optimizePackageImports that cause build issues
   },
 
+  // Turbopack configuration (required for Next.js 16)
+  turbopack: {},
+
   // Webpack optimization - Fixed for Framer Motion
   webpack: (config, { dev, isServer }) => {
     // Production optimizations
@@ -121,20 +124,6 @@ const nextConfig = {
 
   // ✅ Fix: Ensure proper transpilation of packages that might cause issues
   transpilePackages: [],
-  
-  // ✅ Fix: Add modularizeImports to optimize bundle size without breaking imports
-  modularizeImports: {
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
-      skipDefaultConversion: true,
-    },
-    'react-icons/fa': {
-      transform: 'react-icons/fa/{{member}}',
-    },
-    'react-icons/fa6': {
-      transform: 'react-icons/fa6/{{member}}',
-    },
-  },
 }
 
 export default nextConfig
