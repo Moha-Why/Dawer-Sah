@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const { data, error } = await supabaseServer()
       .from("products")
@@ -32,7 +32,7 @@ export async function GET(req, { params }) {
 
 export async function PUT(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
 
 
@@ -73,7 +73,7 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
 
 

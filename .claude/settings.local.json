@@ -4,7 +4,17 @@
       "Bash(npm outdated:*)",
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "WebFetch(domain:de.bellabarnett.com)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(taskkill:*)",
+      "Bash(if exist .next rmdir /s /q .next)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(node:*)",
+      "Bash(tee:*)",
+      "Bash(pkill:*)"
     ]
   }
 }

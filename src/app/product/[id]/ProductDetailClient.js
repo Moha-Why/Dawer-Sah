@@ -146,7 +146,7 @@ export default function ProductDetailClient({
         {/* Product Images - Fixed without Swiper for SSR compatibility */}
         <motion.div variants={itemVariants} className="space-y-4">
           {/* Main Image Display */}
-          <div className="relative rounded-2xl overflow-hidden bg-gray-50 aspect-[4/5] w-full">
+          <div className="relative rounded-2xl overflow-hidden bg-white aspect-[4/5] w-full">
             <Image
               src={product.pictures?.[activeImageIndex] || product.pictures?.[0] || 'https://dfurfmrwpyotjfrryatn.supabase.co/storage/v1/object/public/product-images/casual.png'}
               alt={`${product.name} - Image ${activeImageIndex + 1}`}
@@ -333,7 +333,7 @@ export default function ProductDetailClient({
             <div className="flex items-center gap-4">
               <div className="flex items-center border border-gray-300 rounded-lg">
                 <motion.button
-                  className="px-4 py-2 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 hover:bg-white transition-colors"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -341,7 +341,7 @@ export default function ProductDetailClient({
                 </motion.button>
                 <span className="px-4 py-2 font-medium">{quantity}</span>
                 <motion.button
-                  className="px-4 py-2 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 hover:bg-white transition-colors"
                   onClick={() => setQuantity(quantity + 1)}
                   whileTap={{ scale: 0.95 }}
                 >

@@ -99,7 +99,7 @@ export default function RelatedProducts({ currentProduct }) {
             onMouseLeave={() => setHoveredId(null)}
           >
             {/* صورة المنتج */}
-            <div className="relative overflow-hidden bg-gray-50">
+            <div className="relative overflow-hidden bg-white">
               <Image
                 src={
                   hoveredId === product.id
@@ -196,7 +196,7 @@ export default function RelatedProducts({ currentProduct }) {
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: idx * 0.1 }}
-                      className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
+                      className="text-xs bg-white text-gray-600 px-2 py-1 rounded"
                     >
                       {size}
                     </motion.span>

@@ -4,7 +4,7 @@ import { getAllProducts, getProductById, getRelatedProducts } from '@/lib/produc
 import { notFound } from 'next/navigation'
 
 export default async function ProductDetailPage({ params }) {
-  const { id } = params
+  const { id } = await params
   
   try {
     console.log(`📦 Loading product ${id} with REAL Supabase data...`)
@@ -36,7 +36,7 @@ export default async function ProductDetailPage({ params }) {
 
 // Metadata function
 export async function generateMetadata({ params }) {
-  const { id } = params
+  const { id } = await params
   
   try {
     const product = await getProductById(id)

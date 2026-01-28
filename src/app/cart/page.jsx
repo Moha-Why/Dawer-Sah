@@ -174,7 +174,7 @@ export default function Cart() {
                       ease: "easeOut"
                     }}
                   >
-                    <div className="w-24 h-32 relative rounded-lg overflow-hidden bg-gray-50">
+                    <div className="w-24 h-32 relative rounded-lg overflow-hidden bg-white">
                       <Image
                         src={imgSrc}
                         alt={item.name}
@@ -265,7 +265,7 @@ export default function Cart() {
 
           {/* Cart Summary */}
           <motion.div 
-            className="mt-8 bg-gray-50 rounded-lg p-6"
+            className="mt-8 bg-white rounded-lg p-6"
             variants={totalVariants}
           >
             <div className="flex justify-between items-center text-xl font-bold text-gray-900 mb-4">

@@ -220,7 +220,7 @@ export default function CheckoutPage() {
       {/* Order Summary */}
       {cart.length > 0 && (
         <motion.div
-          className="bg-gray-50 rounded-lg p-4 mb-6"
+          className="bg-white rounded-lg p-4 mb-6"
           variants={formVariants}
         >
           <h2 className="font-semibold text-gray-900 mb-3">Order Summary</h2>

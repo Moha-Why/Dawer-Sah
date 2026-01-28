@@ -181,7 +181,7 @@ export default function StoreSSG({
                     </div>
 
                     {/* Image */}
-                    <div className="relative overflow-hidden bg-gray-50 h-96">
+                    <div className="relative overflow-hidden bg-white h-96">
                       <ProductImage
                         product={product}
                         isHovered={hoveredId === `sale-${product.id}`}
@@ -266,7 +266,7 @@ export default function StoreSSG({
           <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-sm p-6 mb-8">
             {/* Active Category Display */}
             {typeFilter && (
-              <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+              <div className="mb-4 p-4 bg-white rounded-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium text-gray-600">Filtering by:</span>
@@ -306,7 +306,7 @@ export default function StoreSSG({
     <button
       type="button"
       aria-label="Clear all filters"
-      className="px-6 py-3 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
+      className="px-6 py-3 rounded-full text-sm font-medium bg-white text-gray-700 hover:bg-gray-200 transition-all"
       onClick={clearAllFilters}
     >
       Clear All
@@ -316,7 +316,7 @@ export default function StoreSSG({
 
                 
                 <button
-                  className="p-3 rounded-full hover:bg-gray-100 transition-colors"
+                  className="p-3 rounded-full hover:bg-white transition-colors"
                   onClick={() => setShowFilters(!showFilters)}
                   aria-label="Open menu"
                 >
@@ -415,7 +415,7 @@ export default function StoreSSG({
                   onMouseLeave={() => setHoveredId(null)}
                 >
                   {/* Image Container */}
-                  <div className="relative overflow-hidden bg-gray-50 h-96">
+                  <div className="relative overflow-hidden bg-white h-96">
                     <ProductImage
                       product={product}
                       isHovered={hoveredId === product.id}
@@ -480,7 +480,7 @@ export default function StoreSSG({
                         {product.sizes.slice(0, 4).map((size, idx) => (
                           <span
                             key={idx}
-                            className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-medium"
+                            className="text-xs bg-white text-gray-600 px-2 py-1 rounded font-medium"
                           >
                             {size}
                           </span>
