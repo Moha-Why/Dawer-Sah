@@ -249,7 +249,7 @@ export default function ManageProducts() {
   // Filter products based on search term
   const filteredProducts = useMemo(() => {
     if (!searchTerm.trim()) return products;
-    
+
     return products.filter(product =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase().trim())
     );
@@ -279,7 +279,7 @@ export default function ManageProducts() {
         .from("products")
         .select("*")
         .order("id", { ascending: true });
-        
+
       if (error) {
         console.error(error);
         setMessage("Error loading products: " + error.message);
@@ -696,7 +696,7 @@ export default function ManageProducts() {
 
       {/* Loading State */}
       {loading ? (
-        <motion.div 
+        <motion.div
           className="flex flex-col items-center justify-center py-20"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -740,9 +740,11 @@ export default function ManageProducts() {
         </motion.div>
       ) : (
         /* Products Grid */
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
           variants={containerVariants}
+          initial="hidden"
+          animate="visible"
           key={searchTerm}
         >
           {filteredProducts.map((prod, index) => (
