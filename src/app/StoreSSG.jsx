@@ -136,7 +136,7 @@ export default function StoreSSG({
         (!sizeFilter || product.sizes?.includes(sizeFilter)) &&
         (!minPrice || (product.newprice || product.price) >= parseFloat(minPrice)) &&
         (!maxPrice || (product.newprice || product.price) <= parseFloat(maxPrice)) &&
-        (!searchTerm || product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.colors?.some(c => c.toLowerCase().includes(searchTerm.toLowerCase())))
+        (!searchTerm || product.name.toLowerCase().includes(searchTerm.toLowerCase()))
       )
     })
 
