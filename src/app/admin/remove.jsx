@@ -193,23 +193,54 @@ export default function ManageProducts() {
     "pink","brown","gray","beige","cyan","magenta","lime","indigo",
     "violet","turquoise","gold","silver","navy","maroon","olive","teal"
   ];
-  const laptopColorOptions = [
-    "space gray","midnight","starlight","rose gold","graphite",
-    "sierra blue","deep purple","alpine green","platinum",
-    "matte black","pearl white"
+  const popularColorOptions = [
+    "rose gold","blush pink","coral","dusty rose","mauve","burgundy",
+    "wine","champagne","ivory","cream","nude","camel","tan","taupe",
+    "khaki","mint","sage","emerald","forest green","lavender","lilac",
+    "periwinkle","cobalt","powder blue","baby blue","rust","terracotta",
+    "peach","apricot","mustard","off white","charcoal","hot pink",
+    "crimson","copper","bronze","plum","seafoam","sky blue"
   ];
   const colorHexMap = {
-    "space gray": "#717378",
-    "midnight": "#1B1B3A",
-    "starlight": "#F5E6D3",
     "rose gold": "#B76E79",
-    "graphite": "#53565A",
-    "sierra blue": "#69ABD8",
-    "deep purple": "#56445D",
-    "alpine green": "#505F4E",
-    "platinum": "#E5E4E2",
-    "matte black": "#28282B",
-    "pearl white": "#F0EAD6",
+    "blush pink": "#F4C2C2",
+    "coral": "#FF7F50",
+    "dusty rose": "#DCAE96",
+    "mauve": "#E0B0FF",
+    "burgundy": "#800020",
+    "wine": "#722F37",
+    "champagne": "#F7E7CE",
+    "ivory": "#FFFFF0",
+    "cream": "#FFFDD0",
+    "nude": "#E3BC9A",
+    "camel": "#C19A6B",
+    "tan": "#D2B48C",
+    "taupe": "#483C32",
+    "khaki": "#C3B091",
+    "mint": "#98FF98",
+    "sage": "#BCB88A",
+    "emerald": "#50C878",
+    "forest green": "#228B22",
+    "lavender": "#E6E6FA",
+    "lilac": "#C8A2C8",
+    "periwinkle": "#CCCCFF",
+    "cobalt": "#0047AB",
+    "powder blue": "#B0E0E6",
+    "baby blue": "#89CFF0",
+    "rust": "#B7410E",
+    "terracotta": "#E2725B",
+    "peach": "#FFCBA4",
+    "apricot": "#FBCEB1",
+    "mustard": "#FFDB58",
+    "off white": "#FAF9F6",
+    "charcoal": "#36454F",
+    "hot pink": "#FF69B4",
+    "crimson": "#DC143C",
+    "copper": "#B87333",
+    "bronze": "#CD7F32",
+    "plum": "#8E4585",
+    "seafoam": "#93E9BE",
+    "sky blue": "#87CEEB",
   };
   const getColorValue = (color) => colorHexMap[color] || color;
 
@@ -945,9 +976,9 @@ export default function ManageProducts() {
                   ))}
                 </div>
 
-                <h3 className="text-sm font-semibold mb-2 mt-4">Laptop Colors:</h3>
+                <h3 className="text-sm font-semibold mb-2 mt-4">Popular Colors:</h3>
                 <div className="flex flex-wrap gap-2">
-                  {laptopColorOptions.map((color, idx) => (
+                  {popularColorOptions.map((color, idx) => (
                     <motion.button
                       key={color}
                       type="button"

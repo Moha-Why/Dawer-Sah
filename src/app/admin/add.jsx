@@ -49,32 +49,62 @@ export default function AddProductWithRevalidation() {
     "pink","brown","gray","beige","cyan","magenta","lime","indigo",
     "violet","turquoise","gold","silver","navy","maroon","olive","teal"
   ]
-  const laptopColorOptions = [
-    "space gray","midnight","starlight","rose gold","graphite",
-    "sierra blue","deep purple","alpine green","platinum",
-    "matte black","pearl white"
+  const popularColorOptions = [
+    "rose gold","blush pink","coral","dusty rose","mauve","burgundy",
+    "wine","champagne","ivory","cream","nude","camel","tan","taupe",
+    "khaki","mint","sage","emerald","forest green","lavender","lilac",
+    "periwinkle","cobalt","powder blue","baby blue","rust","terracotta",
+    "peach","apricot","mustard","off white","charcoal","hot pink",
+    "crimson","copper","bronze","plum","seafoam","sky blue"
   ]
-  // Hex mapping for non-standard CSS color names (laptop colors)
+  // Hex mapping for non-standard CSS color names
   const colorHexMap = {
-    "space gray": "#717378",
-    "midnight": "#1B1B3A",
-    "starlight": "#F5E6D3",
     "rose gold": "#B76E79",
-    "graphite": "#53565A",
-    "sierra blue": "#69ABD8",
-    "deep purple": "#56445D",
-    "alpine green": "#505F4E",
-    "platinum": "#E5E4E2",
-    "matte black": "#28282B",
-    "pearl white": "#F0EAD6",
+    "blush pink": "#F4C2C2",
+    "coral": "#FF7F50",
+    "dusty rose": "#DCAE96",
+    "mauve": "#E0B0FF",
+    "burgundy": "#800020",
+    "wine": "#722F37",
+    "champagne": "#F7E7CE",
+    "ivory": "#FFFFF0",
+    "cream": "#FFFDD0",
+    "nude": "#E3BC9A",
+    "camel": "#C19A6B",
+    "tan": "#D2B48C",
+    "taupe": "#483C32",
+    "khaki": "#C3B091",
+    "mint": "#98FF98",
+    "sage": "#BCB88A",
+    "emerald": "#50C878",
+    "forest green": "#228B22",
+    "lavender": "#E6E6FA",
+    "lilac": "#C8A2C8",
+    "periwinkle": "#CCCCFF",
+    "cobalt": "#0047AB",
+    "powder blue": "#B0E0E6",
+    "baby blue": "#89CFF0",
+    "rust": "#B7410E",
+    "terracotta": "#E2725B",
+    "peach": "#FFCBA4",
+    "apricot": "#FBCEB1",
+    "mustard": "#FFDB58",
+    "off white": "#FAF9F6",
+    "charcoal": "#36454F",
+    "hot pink": "#FF69B4",
+    "crimson": "#DC143C",
+    "copper": "#B87333",
+    "bronze": "#CD7F32",
+    "plum": "#8E4585",
+    "seafoam": "#93E9BE",
+    "sky blue": "#87CEEB",
   }
   const getColorValue = (color) => colorHexMap[color] || color
 
   const sizeOptions = ["S", "M", "L", "XL"]
-  const typeOptions = ["dress", "casual", "bag", "laptop"]
+  const typeOptions = ["dress", "casual", "bag"]
 
   const isBag = type.toLowerCase() === "bag"
-  const isLaptop = type.toLowerCase() === "laptop"
 
   const handleCheckboxChange = (value, state, setState) => {
     if (state.includes(value)) {
@@ -86,7 +116,7 @@ export default function AddProductWithRevalidation() {
 
   const handleTypeChange = (newType) => {
     setType(newType)
-    if (newType.toLowerCase() === "bag" || newType.toLowerCase() === "laptop") {
+    if (newType.toLowerCase() === "bag") {
       setSizes([])
     }
   }
@@ -220,7 +250,7 @@ export default function AddProductWithRevalidation() {
     setLoading(true)
     setMessage("")
 
-    if (!name || !price || colors.length === 0 || (!isBag && !isLaptop && sizes.length === 0) || !type || files.length === 0) {
+    if (!name || !price || colors.length === 0 || (!isBag && sizes.length === 0) || !type || files.length === 0) {
       setMessage("Please fill in all required fields.")
       setLoading(false)
       return
@@ -245,7 +275,7 @@ export default function AddProductWithRevalidation() {
         description: description || "",
         pictures: pictureUrls,
         colors,
-        sizes: (isBag || isLaptop) ? [] : sizes,
+        sizes: isBag ? [] : sizes,
         type,
         owner_id: "dev-user-123"
       }
@@ -457,9 +487,9 @@ The product is saved but NOT live yet - you control when it goes public.`)
                 </div>
 
                 <div className="border-t border-gray-200 my-3"></div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Laptop Colors</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Popular Colors</p>
                 <div className="grid grid-cols-3 gap-2">
-                  {laptopColorOptions.map((color, idx) => (
+                  {popularColorOptions.map((color, idx) => (
                     <motion.label
                       key={color}
                       className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50 transition-colors"
@@ -491,7 +521,7 @@ The product is saved but NOT live yet - you control when it goes public.`)
 
       {/* Sizes */}
       <AnimatePresence>
-        {!isBag && !isLaptop && (
+        {!isBag && (
           <motion.div 
             variants={inputVariants}
             initial="hidden"
