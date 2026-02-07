@@ -37,18 +37,29 @@ export async function PUT(req, { params }) {
 
 
 
+    // If color_images is provided, derive colors and pictures from it
+    const updateData = {
+      name: body.name,
+      price: body.price,
+      newprice: body.newprice || null,
+      colors: body.colors || [],
+      sizes: body.sizes || [],
+      type: body.type || null,
+      description: body.description || "",
+      pictures: body.pictures || []
+    };
+
+    if (body.color_images !== undefined) {
+      updateData.color_images = body.color_images;
+      if (body.color_images && typeof body.color_images === "object") {
+        updateData.colors = Object.keys(body.color_images);
+        updateData.pictures = Object.values(body.color_images).flat();
+      }
+    }
+
     const { data, error } = await supabaseServer()
       .from("products")
-      .update({
-        name: body.name,
-        price: body.price,
-        newprice: body.newprice || null,
-        colors: body.colors || [],
-        sizes: body.sizes || [],
-        type: body.type || null,
-        description: body.description || "",
-        pictures: body.pictures || []
-      })
+      .update(updateData)
       .eq("id", id)
       .select()
       .single();

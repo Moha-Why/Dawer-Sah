@@ -179,9 +179,11 @@ export default function ManageProducts() {
   const [editName, setEditName] = useState("");
   const [editPrice, setEditPrice] = useState("");
   const [editNewPrice, setEditNewPrice] = useState("");
-  const [editColors, setEditColors] = useState([]);
-  const [editPictures, setEditPictures] = useState([]);
   const [uploadingImages, setUploadingImages] = useState(false);
+
+  // Color-image mapping for edit: { "burgundy": { existingUrls: [...], newFiles: [], newPreviews: [] } }
+  const [editColorImageMap, setEditColorImageMap] = useState({});
+  const [showEditColorPicker, setShowEditColorPicker] = useState(false);
 
   // Confirmation modal state
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -365,14 +367,69 @@ export default function ManageProducts() {
     setEditName(prod.name);
     setEditPrice(prod.price);
     setEditNewPrice(prod.newprice || "");
-    setEditColors(prod.colors || []);
-    setEditPictures(prod.pictures || []);
+
+    // Build color-image map from product data
+    if (prod.color_images && typeof prod.color_images === "object" && Object.keys(prod.color_images).length > 0) {
+      const map = {};
+      for (const [color, urls] of Object.entries(prod.color_images)) {
+        map[color] = { existingUrls: [...urls], newFiles: [], newPreviews: [] };
+      }
+      setEditColorImageMap(map);
+    } else {
+      // Old product without color_images - admin must re-link
+      setEditColorImageMap({});
+    }
+    setShowEditColorPicker(false);
   };
 
-  const toggleColor = (color) => {
-    setEditColors((prev) =>
-      prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color]
-    );
+  const addEditColor = (color) => {
+    if (!editColorImageMap[color]) {
+      setEditColorImageMap(prev => ({ ...prev, [color]: { existingUrls: [], newFiles: [], newPreviews: [] } }));
+    }
+    setShowEditColorPicker(false);
+  };
+
+  const removeEditColor = (color) => {
+    setEditColorImageMap(prev => {
+      const newMap = { ...prev };
+      newMap[color]?.newPreviews.forEach(url => URL.revokeObjectURL(url));
+      delete newMap[color];
+      return newMap;
+    });
+  };
+
+  const removeEditExistingImage = async (color, index) => {
+    const imageUrl = editColorImageMap[color].existingUrls[index];
+    try {
+      if (imageUrl && imageUrl.includes('/product-images/')) {
+        const urlParts = imageUrl.split('/product-images/');
+        const fileName = urlParts[urlParts.length - 1];
+        await supabase.storage.from('product-images').remove([fileName]);
+      }
+    } catch (error) {
+      console.error('Storage delete error:', error);
+    }
+    setEditColorImageMap(prev => ({
+      ...prev,
+      [color]: {
+        ...prev[color],
+        existingUrls: prev[color].existingUrls.filter((_, i) => i !== index)
+      }
+    }));
+  };
+
+  const removeEditNewImage = (color, index) => {
+    setEditColorImageMap(prev => {
+      URL.revokeObjectURL(prev[color].newPreviews[index]);
+      return {
+        ...prev,
+        [color]: {
+          ...prev[color],
+          newFiles: prev[color].newFiles.filter((_, i) => i !== index),
+          newPreviews: prev[color].newPreviews.filter((_, i) => i !== index)
+        }
+      };
+    });
   };
 
   // Image resize function
@@ -408,126 +465,44 @@ export default function ManageProducts() {
     });
   };
 
-  const handleImageUpload = async (event) => {
+  const handleEditColorImageUpload = async (color, event) => {
     const files = Array.from(event.target.files);
     if (files.length === 0) return;
 
     setUploadingImages(true);
     setMessage("Processing images...");
-    
+
     try {
-      const processedFiles = [];
-      const uploadedUrls = [];
+      const resizedFiles = [];
+      const previews = [];
 
-      // First, resize all images
       for (const file of files) {
-        if (!file.type.startsWith('image/')) {
-          console.warn(`Skipping non-image file: ${file.name}`);
-          setMessage(`File ${file.name} is not an image`);
-          continue;
-        }
-
+        if (!file.type.startsWith('image/')) continue;
         if (file.size > 5242880) {
-          console.warn(`File too large: ${file.name}`);
           setMessage(`File ${file.name} is too large (max 5MB)`);
           continue;
         }
-
-        // Resize the image
         const resizedFile = await resizeImage(file);
-        processedFiles.push(resizedFile);
+        resizedFiles.push(resizedFile);
+        previews.push(URL.createObjectURL(resizedFile));
       }
 
-      if (processedFiles.length === 0) {
-        setMessage("No valid images to process");
-        setUploadingImages(false);
-        return;
-      }
-
-      setMessage("Uploading images...");
-
-      // Now upload the resized images
-      for (const file of processedFiles) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
-        
-        const { data, error } = await supabase.storage
-          .from('product-images')
-          .upload(fileName, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        if (error) {
-          console.error('Upload error for', file.name, ':', error);
-          
-          if (error.message.includes('Bucket not found')) {
-            setMessage('Storage bucket "product-images" not found. Please create it manually in Supabase Dashboard');
-            setTimeout(() => setMessage(""), 10000);
-            break;
-          } else if (error.message.includes('row-level security') || error.message.includes('RLS')) {
-            setMessage('RLS Policy Error: Please run the SQL commands to fix storage policies');
-            setTimeout(() => setMessage(""), 15000);
-            break;
-          } else if (error.message.includes('permission') || error.message.includes('denied')) {
-            setMessage('Permission denied. Please check your Supabase storage policies');
-            setTimeout(() => setMessage(""), 8000);
-            break;
-          } else {
-            setMessage(`Error uploading ${file.name}: ${error.message}`);
-          }
-          continue;
+      setEditColorImageMap(prev => ({
+        ...prev,
+        [color]: {
+          ...prev[color],
+          newFiles: [...prev[color].newFiles, ...resizedFiles],
+          newPreviews: [...prev[color].newPreviews, ...previews]
         }
-
-        const { data: urlData } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(fileName);
-
-        if (urlData?.publicUrl) {
-          uploadedUrls.push(urlData.publicUrl);
-        }
-      }
-
-      if (uploadedUrls.length > 0) {
-        setEditPictures(prev => [...prev, ...uploadedUrls]);
-        setMessage(`Successfully uploaded ${uploadedUrls.length} image(s)`);
-        setTimeout(() => setMessage(""), 3000);
-      } else if (uploadedUrls.length === 0 && processedFiles.length > 0) {
-        setMessage("No images were uploaded successfully");
-        setTimeout(() => setMessage(""), 3000);
-      }
-
+      }));
+      setMessage("");
     } catch (error) {
-      console.error('Image upload error:', error);
-      setMessage("Error uploading images: " + error.message);
-      setTimeout(() => setMessage(""), 5000);
+      console.error('Image processing error:', error);
+      setMessage("Error processing images: " + error.message);
     } finally {
       setUploadingImages(false);
       event.target.value = '';
     }
-  };
-
-  const removeImage = async (indexToRemove) => {
-    const imageUrl = editPictures[indexToRemove];
-    
-    try {
-      if (imageUrl && imageUrl.includes('/product-images/')) {
-        const urlParts = imageUrl.split('/product-images/');
-        const fileName = urlParts[urlParts.length - 1];
-        
-        const { error } = await supabase.storage
-          .from('product-images')
-          .remove([fileName]);
-          
-        if (error) {
-          console.error('Error deleting image from storage:', error);
-        }
-      }
-    } catch (error) {
-      console.error('Storage delete error:', error);
-    }
-    
-    setEditPictures(prev => prev.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSaveEdit = async () => {
@@ -537,18 +512,54 @@ export default function ManageProducts() {
       return;
     }
 
+    const colorNames = Object.keys(editColorImageMap);
+    if (colorNames.length === 0) {
+      setMessage("Please add at least one color with images.");
+      setTimeout(() => setMessage(""), 3000);
+      return;
+    }
+
     try {
+      setUploadingImages(true);
+      setMessage("Uploading new images...");
+
+      // Build final color_images: upload new files, combine with existing URLs
+      const colorImagesResult = {};
+      for (const [color, entry] of Object.entries(editColorImageMap)) {
+        const urls = [...entry.existingUrls];
+
+        // Upload new files for this color
+        for (const file of entry.newFiles) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+          const { error } = await supabase.storage
+            .from('product-images')
+            .upload(fileName, file, { cacheControl: '3600', upsert: false });
+          if (error) {
+            console.error('Upload error:', error);
+            continue;
+          }
+          const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
+          if (urlData?.publicUrl) urls.push(urlData.publicUrl);
+        }
+
+        if (urls.length > 0) {
+          colorImagesResult[color] = urls;
+        }
+      }
+
+      setMessage("Saving product...");
+
       const res = await fetch(`/api/products/${editingProduct.id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: editName.trim(),
           price: Number(editPrice),
           newprice: editNewPrice ? Number(editNewPrice) : null,
-          colors: editColors,
-          pictures: editPictures
+          color_images: colorImagesResult,
+          colors: Object.keys(colorImagesResult),
+          pictures: Object.values(colorImagesResult).flat()
         }),
       });
 
@@ -557,7 +568,6 @@ export default function ManageProducts() {
         throw new Error(errorData.error || "Failed to update product");
       }
 
-      // Trigger revalidation for SSG/ISR pages on update
       try {
         await fetch('/api/revalidate', {
           method: 'POST',
@@ -568,6 +578,11 @@ export default function ManageProducts() {
         console.warn('Revalidation request failed:', revError);
       }
 
+      // Clean up preview URLs
+      Object.values(editColorImageMap).forEach(entry =>
+        entry.newPreviews.forEach(url => URL.revokeObjectURL(url))
+      );
+
       setEditingProduct(null);
       setMessage("Product updated successfully!");
       fetchProducts();
@@ -576,6 +591,8 @@ export default function ManageProducts() {
       console.error("Update error:", error);
       setMessage("Error updating product: " + error.message);
       setTimeout(() => setMessage(""), 5000);
+    } finally {
+      setUploadingImages(false);
     }
   };
 
@@ -945,128 +962,116 @@ export default function ManageProducts() {
                 transition={{ duration: 0.3, delay: 0.3 }}
               />
 
-              {/* Colors */}
-              <motion.div 
-                className="mb-4"
+              {/* Colors & Images */}
+              <motion.div
+                className="mb-6"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.4 }}
               >
-                <h3 className="text-sm font-semibold mb-2">General Colors:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {colorOptions.map((color, idx) => (
-                    <motion.button
-                      key={color}
-                      type="button"
-                      onClick={() => toggleColor(color)}
-                      className={`px-3 py-1 rounded border text-sm transition flex items-center gap-1.5 ${
-                        editColors.includes(color)
-                          ? "bg-fuchsia-600 text-white border-fuchsia-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-fuchsia-600"
-                      }`}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.2, delay: idx * 0.02 }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: color }}></span>
-                      {color}
-                    </motion.button>
-                  ))}
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold">Colors & Images:</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowEditColorPicker(!showEditColorPicker)}
+                    className="px-3 py-1 bg-fuchsia-600 text-white rounded-full text-xs font-medium hover:bg-fuchsia-700 transition"
+                  >
+                    + Add Color
+                  </button>
                 </div>
 
-                <h3 className="text-sm font-semibold mb-2 mt-4">Popular Colors:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {popularColorOptions.map((color, idx) => (
-                    <motion.button
-                      key={color}
-                      type="button"
-                      onClick={() => toggleColor(color)}
-                      className={`px-3 py-1 rounded border text-sm transition flex items-center gap-1.5 capitalize ${
-                        editColors.includes(color)
-                          ? "bg-fuchsia-600 text-white border-fuchsia-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-fuchsia-600"
-                      }`}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.2, delay: idx * 0.02 }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                {/* Color Picker */}
+                <AnimatePresence>
+                  {showEditColorPicker && (
+                    <motion.div
+                      className="mb-3 border border-fuchsia-200 rounded-lg p-2 bg-white shadow max-h-48 overflow-y-auto"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
                     >
-                      <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: getColorValue(color) }}></span>
-                      {color}
-                    </motion.button>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Images */}
-              <motion.div 
-                className="mb-6"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.5 }}
-              >
-                <h3 className="text-sm font-semibold mb-3">Images:</h3>
-                
-                {/* Current Images */}
-                {editPictures.length > 0 && (
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    {editPictures.map((img, idx) => (
-                      <div key={idx} className="relative group">
-                        <Image
-                          src={img}
-                          alt={`Product ${idx + 1}`}
-                          width={120}
-                          height={120}
-                          className="rounded object-cover w-full h-24"
-                        />
-                        <button
-                          onClick={() => removeImage(idx)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition"
-                        >
-                          X
-                        </button>
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-1">General</p>
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {colorOptions.filter(c => !editColorImageMap[c]).map((color) => (
+                          <button key={color} type="button" onClick={() => addEditColor(color)}
+                            className="flex items-center gap-1 px-2 py-1 rounded text-xs hover:bg-gray-100 transition capitalize">
+                            <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: color }}></span>
+                            {color}
+                          </button>
+                        ))}
                       </div>
-                    ))}
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Popular</p>
+                      <div className="flex flex-wrap gap-1">
+                        {popularColorOptions.filter(c => !editColorImageMap[c]).map((color) => (
+                          <button key={color} type="button" onClick={() => addEditColor(color)}
+                            className="flex items-center gap-1 px-2 py-1 rounded text-xs hover:bg-gray-100 transition capitalize">
+                            <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: getColorValue(color) }}></span>
+                            {color}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* No color_images warning for old products */}
+                {Object.keys(editColorImageMap).length === 0 && editingProduct && !editingProduct.color_images && (
+                  <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-xs text-yellow-800">
+                    This product has no color-image links. Add colors and upload images for each to set up the mapping.
                   </div>
                 )}
 
-                {/* Upload New Images */}
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-fuchsia-600 transition">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="image-upload"
-                    disabled={uploadingImages}
-                  />
-                  <label 
-                    htmlFor="image-upload" 
-                    className={`cursor-pointer text-fuchsia-600 hover:text-fuchsia-700 font-medium ${
-                      uploadingImages ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {uploadingImages ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <motion.div
-                          className="w-4 h-4 border-2 border-fuchsia-600 border-t-transparent rounded-full"
-                          variants={loadingVariants}
-                          animate="animate"
-                        />
-                        {message.includes("Processing") ? "Processing..." : "Uploading..."}
-                      </span>
-                    ) : (
-                      'Upload Images'
-                    )}
-                  </label>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Click to select multiple images (Max 5MB each)<br/>
-                    Images will be resized to 768x950px automatically
-                  </p>
+                {/* Color Cards */}
+                <div className="space-y-3">
+                  {Object.entries(editColorImageMap).map(([color, entry]) => {
+                    const inputId = `edit-upload-${color.replace(/\s+/g, '-')}`;
+                    return (
+                      <div key={color} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full border border-gray-300" style={{ backgroundColor: getColorValue(color) }}></span>
+                            <span className="font-medium capitalize text-sm">{color}</span>
+                            <span className="text-xs text-gray-400">({entry.existingUrls.length + entry.newFiles.length})</span>
+                          </div>
+                          <button type="button" onClick={() => removeEditColor(color)} className="text-red-500 hover:text-red-700 text-xs font-medium">Remove</button>
+                        </div>
+
+                        {/* Existing images */}
+                        {(entry.existingUrls.length > 0 || entry.newPreviews.length > 0) && (
+                          <div className="grid grid-cols-4 gap-2 mb-2">
+                            {entry.existingUrls.map((img, idx) => (
+                              <div key={`existing-${idx}`} className="relative group">
+                                <Image src={img} alt={`${color} ${idx + 1}`} width={80} height={80} className="rounded object-cover w-full h-16" />
+                                <button onClick={() => removeEditExistingImage(color, idx)}
+                                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600 transition opacity-0 group-hover:opacity-100">
+                                  ×
+                                </button>
+                              </div>
+                            ))}
+                            {entry.newPreviews.map((url, idx) => (
+                              <div key={`new-${idx}`} className="relative group">
+                                <img src={url} alt={`${color} new ${idx + 1}`} className="rounded object-cover w-full h-16 border border-fuchsia-300" />
+                                <button onClick={() => removeEditNewImage(color, idx)}
+                                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600 transition opacity-0 group-hover:opacity-100">
+                                  ×
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Upload for this color */}
+                        <div className="border border-dashed border-gray-300 rounded p-2 text-center hover:border-fuchsia-400 transition">
+                          <input type="file" accept="image/*" multiple onChange={(e) => handleEditColorImageUpload(color, e)}
+                            className="hidden" id={inputId} disabled={uploadingImages} />
+                          <label htmlFor={inputId}
+                            className={`cursor-pointer text-fuchsia-600 hover:text-fuchsia-700 font-medium text-xs ${uploadingImages ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            {uploadingImages ? 'Processing...' : `Add images for ${color}`}
+                          </label>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </motion.div>
 

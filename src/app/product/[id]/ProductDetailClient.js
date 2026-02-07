@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useMyContext } from "../../../context/CartContext"
 import { motion, AnimatePresence } from "framer-motion"
 import toast from "react-hot-toast"
@@ -101,6 +101,14 @@ export default function ProductDetailClient({
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [loading, setLoading] = useState(false)
 
+  // Compute images to display based on selected color
+  const currentImages = useMemo(() => {
+    if (product?.color_images && selectedColor && product.color_images[selectedColor]) {
+      return product.color_images[selectedColor]
+    }
+    return product?.pictures || []
+  }, [product, selectedColor])
+
   // Initialize selected color and size
   useEffect(() => {
     if (product) {
@@ -112,6 +120,11 @@ export default function ProductDetailClient({
       }
     }
   }, [product, selectedColor, selectedSize])
+
+  const handleColorSelect = (color) => {
+    setSelectedColor(color)
+    setActiveImageIndex(0)
+  }
 
   // Handle add to cart
   const handleAddToCart = async () => {
@@ -192,7 +205,7 @@ export default function ProductDetailClient({
           {/* Main Image Display */}
           <div className="relative rounded-2xl overflow-hidden bg-white aspect-[4/5] w-full">
             <Image
-              src={product.pictures?.[activeImageIndex] || product.pictures?.[0] || 'https://dfurfmrwpyotjfrryatn.supabase.co/storage/v1/object/public/product-images/casual.png'}
+              src={currentImages[activeImageIndex] || currentImages[0] || 'https://dfurfmrwpyotjfrryatn.supabase.co/storage/v1/object/public/product-images/casual.png'}
               alt={`${product.name} - Image ${activeImageIndex + 1}`}
               fill
               className="object-cover"
@@ -216,19 +229,19 @@ export default function ProductDetailClient({
             )}
 
             {/* Navigation Arrows for Images */}
-            {product.pictures && product.pictures.length > 1 && (
+            {currentImages.length > 1 && (
               <>
                 <button
-                  onClick={() => setActiveImageIndex(prev => 
-                    prev === 0 ? product.pictures.length - 1 : prev - 1
+                  onClick={() => setActiveImageIndex(prev =>
+                    prev === 0 ? currentImages.length - 1 : prev - 1
                   )}
                   className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all z-10"
                 >
                   ←
                 </button>
                 <button
-                  onClick={() => setActiveImageIndex(prev => 
-                    prev === product.pictures.length - 1 ? 0 : prev + 1
+                  onClick={() => setActiveImageIndex(prev =>
+                    prev === currentImages.length - 1 ? 0 : prev + 1
                   )}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all z-10"
                 >
@@ -237,7 +250,7 @@ export default function ProductDetailClient({
 
                 {/* Image Indicators */}
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                  {product.pictures.map((_, index) => (
+                  {currentImages.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setActiveImageIndex(index)}
@@ -252,9 +265,9 @@ export default function ProductDetailClient({
           </div>
 
           {/* Thumbnail Images */}
-          {product.pictures && product.pictures.length > 1 && (
+          {currentImages.length > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-2">
-              {product.pictures.map((image, index) => (
+              {currentImages.map((image, index) => (
                 <motion.button
                   key={index}
                   className={`flex-shrink-0 w-20 h-24 rounded-lg overflow-hidden border-2 transition-colors ${
@@ -332,7 +345,7 @@ export default function ProductDetailClient({
                         : 'border-gray-300 hover:border-gray-400'
                     }`}
                     style={{ backgroundColor: getColorValue(color) }}
-                    onClick={() => setSelectedColor(color)}
+                    onClick={() => handleColorSelect(color)}
                     variants={buttonVariants}
                     initial="idle"
                     whileHover="hover"

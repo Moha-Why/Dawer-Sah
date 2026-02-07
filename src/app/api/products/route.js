@@ -4,11 +4,17 @@ export async function POST(req) {
   try {
     const body = await req.json()
 
-const { data, error } = await supabaseServer()
-  .from("products")
-  .insert([body])
-  .select()
-  .single()
+    // If color_images is provided, derive colors and pictures from it
+    if (body.color_images && typeof body.color_images === "object") {
+      body.colors = Object.keys(body.color_images)
+      body.pictures = Object.values(body.color_images).flat()
+    }
+
+    const { data, error } = await supabaseServer()
+      .from("products")
+      .insert([body])
+      .select()
+      .single()
 
     if (error) {
       console.error("Insert error:", error)
