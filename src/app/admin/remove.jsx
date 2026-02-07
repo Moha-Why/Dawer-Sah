@@ -193,6 +193,25 @@ export default function ManageProducts() {
     "pink","brown","gray","beige","cyan","magenta","lime","indigo",
     "violet","turquoise","gold","silver","navy","maroon","olive","teal"
   ];
+  const laptopColorOptions = [
+    "space gray","midnight","starlight","rose gold","graphite",
+    "sierra blue","deep purple","alpine green","platinum",
+    "matte black","pearl white"
+  ];
+  const colorHexMap = {
+    "space gray": "#717378",
+    "midnight": "#1B1B3A",
+    "starlight": "#F5E6D3",
+    "rose gold": "#B76E79",
+    "graphite": "#53565A",
+    "sierra blue": "#69ABD8",
+    "deep purple": "#56445D",
+    "alpine green": "#505F4E",
+    "platinum": "#E5E4E2",
+    "matte black": "#28282B",
+    "pearl white": "#F0EAD6",
+  };
+  const getColorValue = (color) => colorHexMap[color] || color;
 
   // Filter products based on search term
   const filteredProducts = useMemo(() => {
@@ -902,16 +921,16 @@ export default function ManageProducts() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.4 }}
               >
-                <h3 className="text-sm font-semibold mb-2">Colors:</h3>
+                <h3 className="text-sm font-semibold mb-2">General Colors:</h3>
                 <div className="flex flex-wrap gap-2">
                   {colorOptions.map((color, idx) => (
                     <motion.button
                       key={color}
                       type="button"
                       onClick={() => toggleColor(color)}
-                      className={`px-3 py-1 rounded border text-sm transition ${
-                        editColors.includes(color) 
-                          ? "bg-fuchsia-600 text-white border-fuchsia-600" 
+                      className={`px-3 py-1 rounded border text-sm transition flex items-center gap-1.5 ${
+                        editColors.includes(color)
+                          ? "bg-fuchsia-600 text-white border-fuchsia-600"
                           : "bg-white text-gray-700 border-gray-300 hover:border-fuchsia-600"
                       }`}
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -920,6 +939,31 @@ export default function ManageProducts() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
+                      <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: color }}></span>
+                      {color}
+                    </motion.button>
+                  ))}
+                </div>
+
+                <h3 className="text-sm font-semibold mb-2 mt-4">Laptop Colors:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {laptopColorOptions.map((color, idx) => (
+                    <motion.button
+                      key={color}
+                      type="button"
+                      onClick={() => toggleColor(color)}
+                      className={`px-3 py-1 rounded border text-sm transition flex items-center gap-1.5 capitalize ${
+                        editColors.includes(color)
+                          ? "bg-fuchsia-600 text-white border-fuchsia-600"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-fuchsia-600"
+                      }`}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2, delay: idx * 0.02 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: getColorValue(color) }}></span>
                       {color}
                     </motion.button>
                   ))}

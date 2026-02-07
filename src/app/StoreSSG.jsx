@@ -39,6 +39,31 @@ export default function StoreSSG({
   const [sortBy, setSortBy] = useState("newest")
   const [hoveredId, setHoveredId] = useState(null)
 
+  // Hex mapping for non-standard CSS color names (laptop colors)
+  const colorHexMap = {
+    "space gray": "#717378",
+    "midnight": "#1B1B3A",
+    "starlight": "#F5E6D3",
+    "rose gold": "#B76E79",
+    "graphite": "#53565A",
+    "sierra blue": "#69ABD8",
+    "deep purple": "#56445D",
+    "alpine green": "#505F4E",
+    "platinum": "#E5E4E2",
+    "matte black": "#28282B",
+    "pearl white": "#F0EAD6",
+  }
+  const getColorValue = (color) => colorHexMap[color] || color
+
+  // Extract unique colors from all products for dynamic filter
+  const availableColors = useMemo(() => {
+    const colorSet = new Set()
+    initialProducts.forEach(product => {
+      product.colors?.forEach(c => colorSet.add(c))
+    })
+    return Array.from(colorSet).sort()
+  }, [initialProducts])
+
   console.log(`🏪 StoreSSG rendered with ${initialProducts.length} products`)
 
   // Product Image Component مع fallback محسن بدون hydration issues
@@ -83,7 +108,7 @@ export default function StoreSSG({
         (!sizeFilter || product.sizes?.includes(sizeFilter)) &&
         (!minPrice || (product.newprice || product.price) >= parseFloat(minPrice)) &&
         (!maxPrice || (product.newprice || product.price) <= parseFloat(maxPrice)) &&
-        (!searchTerm || product.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        (!searchTerm || product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.colors?.some(c => c.toLowerCase().includes(searchTerm.toLowerCase())))
       )
     })
 
@@ -338,13 +363,14 @@ export default function StoreSSG({
                     <select
                       value={colorFilter}
                       onChange={(e) => setColorFilter(e.target.value)}
-                      className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                      className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black capitalize"
                     >
                       <option value="">All Colors</option>
-                      <option value="black">Black</option>
-                      <option value="white">White</option>
-                      <option value="red">Red</option>
-                      <option value="blue">Blue</option>
+                      {availableColors.map((color) => (
+                        <option key={color} value={color} className="capitalize">
+                          {color}
+                        </option>
+                      ))}
                     </select>
 
                     <select
@@ -437,7 +463,7 @@ export default function StoreSSG({
                           <div
                             key={idx}
                             className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
-                            style={{ backgroundColor: color }}
+                            style={{ backgroundColor: getColorValue(color) }}
                           />
                         ))}
                         {product.colors.length > 4 && (

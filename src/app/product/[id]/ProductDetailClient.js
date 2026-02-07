@@ -44,10 +44,26 @@ const buttonVariants = {
   tap: { scale: 0.98 }
 }
 
-export default function ProductDetailClient({ 
-  productId, 
-  initialProduct, 
-  initialRelatedProducts = [] 
+// Hex mapping for non-standard CSS color names (laptop colors)
+const colorHexMap = {
+  "space gray": "#717378",
+  "midnight": "#1B1B3A",
+  "starlight": "#F5E6D3",
+  "rose gold": "#B76E79",
+  "graphite": "#53565A",
+  "sierra blue": "#69ABD8",
+  "deep purple": "#56445D",
+  "alpine green": "#505F4E",
+  "platinum": "#E5E4E2",
+  "matte black": "#28282B",
+  "pearl white": "#F0EAD6",
+}
+const getColorValue = (color) => colorHexMap[color] || color
+
+export default function ProductDetailClient({
+  productId,
+  initialProduct,
+  initialRelatedProducts = []
 }) {
   const { addToCart } = useMyContext()
   const [product, setProduct] = useState(initialProduct)
@@ -287,7 +303,7 @@ export default function ProductDetailClient({
                         ? 'border-black shadow-lg' 
                         : 'border-gray-300 hover:border-gray-400'
                     }`}
-                    style={{ backgroundColor: color }}
+                    style={{ backgroundColor: getColorValue(color) }}
                     onClick={() => setSelectedColor(color)}
                     variants={buttonVariants}
                     initial="idle"

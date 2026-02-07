@@ -49,10 +49,32 @@ export default function AddProductWithRevalidation() {
     "pink","brown","gray","beige","cyan","magenta","lime","indigo",
     "violet","turquoise","gold","silver","navy","maroon","olive","teal"
   ]
+  const laptopColorOptions = [
+    "space gray","midnight","starlight","rose gold","graphite",
+    "sierra blue","deep purple","alpine green","platinum",
+    "matte black","pearl white"
+  ]
+  // Hex mapping for non-standard CSS color names (laptop colors)
+  const colorHexMap = {
+    "space gray": "#717378",
+    "midnight": "#1B1B3A",
+    "starlight": "#F5E6D3",
+    "rose gold": "#B76E79",
+    "graphite": "#53565A",
+    "sierra blue": "#69ABD8",
+    "deep purple": "#56445D",
+    "alpine green": "#505F4E",
+    "platinum": "#E5E4E2",
+    "matte black": "#28282B",
+    "pearl white": "#F0EAD6",
+  }
+  const getColorValue = (color) => colorHexMap[color] || color
+
   const sizeOptions = ["S", "M", "L", "XL"]
-  const typeOptions = ["dress", "casual", "bag"]
+  const typeOptions = ["dress", "casual", "bag", "laptop"]
 
   const isBag = type.toLowerCase() === "bag"
+  const isLaptop = type.toLowerCase() === "laptop"
 
   const handleCheckboxChange = (value, state, setState) => {
     if (state.includes(value)) {
@@ -64,7 +86,7 @@ export default function AddProductWithRevalidation() {
 
   const handleTypeChange = (newType) => {
     setType(newType)
-    if (newType.toLowerCase() === "bag") {
+    if (newType.toLowerCase() === "bag" || newType.toLowerCase() === "laptop") {
       setSizes([])
     }
   }
@@ -198,7 +220,7 @@ export default function AddProductWithRevalidation() {
     setLoading(true)
     setMessage("")
 
-    if (!name || !price || colors.length === 0 || (!isBag && sizes.length === 0) || !type || files.length === 0) {
+    if (!name || !price || colors.length === 0 || (!isBag && !isLaptop && sizes.length === 0) || !type || files.length === 0) {
       setMessage("Please fill in all required fields.")
       setLoading(false)
       return
@@ -223,7 +245,7 @@ export default function AddProductWithRevalidation() {
         description: description || "",
         pictures: pictureUrls,
         colors,
-        sizes: isBag ? [] : sizes,
+        sizes: (isBag || isLaptop) ? [] : sizes,
         type,
         owner_id: "dev-user-123"
       }
@@ -406,30 +428,61 @@ The product is saved but NOT live yet - you control when it goes public.`)
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="grid grid-cols-3 gap-2">
-                {colorOptions.map((color, idx) => (
-                  <motion.label 
-                    key={color} 
-                    className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50 transition-colors"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.2, delay: idx * 0.02 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <input 
-                      type="checkbox" 
-                      className="w-4 h-4 accent-purple-600" 
-                      checked={colors.includes(color)} 
-                      onChange={() => handleCheckboxChange(color, colors, setColors)} 
-                    />
-                    <span 
-                      className="w-5 h-5 rounded-full border-2 border-gray-300 shadow-sm" 
-                      style={{ backgroundColor: color }}
-                    ></span>
-                    <span className="capitalize text-sm">{color}</span>
-                  </motion.label>
-                ))}
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">General Colors</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {colorOptions.map((color, idx) => (
+                    <motion.label
+                      key={color}
+                      className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50 transition-colors"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2, delay: idx * 0.02 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 accent-purple-600"
+                        checked={colors.includes(color)}
+                        onChange={() => handleCheckboxChange(color, colors, setColors)}
+                      />
+                      <span
+                        className="w-5 h-5 rounded-full border-2 border-gray-300 shadow-sm"
+                        style={{ backgroundColor: color }}
+                      ></span>
+                      <span className="capitalize text-sm">{color}</span>
+                    </motion.label>
+                  ))}
+                </div>
+
+                <div className="border-t border-gray-200 my-3"></div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Laptop Colors</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {laptopColorOptions.map((color, idx) => (
+                    <motion.label
+                      key={color}
+                      className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50 transition-colors"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2, delay: idx * 0.02 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 accent-purple-600"
+                        checked={colors.includes(color)}
+                        onChange={() => handleCheckboxChange(color, colors, setColors)}
+                      />
+                      <span
+                        className="w-5 h-5 rounded-full border-2 border-gray-300 shadow-sm"
+                        style={{ backgroundColor: getColorValue(color) }}
+                      ></span>
+                      <span className="capitalize text-sm">{color}</span>
+                    </motion.label>
+                  ))}
+                </div>
               </div>
             </motion.div>
           )}
@@ -438,7 +491,7 @@ The product is saved but NOT live yet - you control when it goes public.`)
 
       {/* Sizes */}
       <AnimatePresence>
-        {!isBag && (
+        {!isBag && !isLaptop && (
           <motion.div 
             variants={inputVariants}
             initial="hidden"
