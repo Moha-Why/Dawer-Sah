@@ -1,5 +1,5 @@
 {
-  "name": "wn-store",
+  "name": "dawer-sah",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -34,15 +34,15 @@
     "@tailwindcss/postcss": "^4",
     "tailwindcss": "^4"
   },
-  "description": "Wn Store - Fashion E-commerce Website",
+  "description": "Dawer Sah - Used Car Dealership Website",
   "main": "index.js",
   "keywords": [
-    "fashion",
-    "ecommerce",
+    "used-cars",
+    "dealership",
     "nextjs",
-    "supabase"
+    "automotive"
   ],
-  "author": "Wn Store",
+  "author": "Dawer Sah",
   "license": "ISC",
   "type": "module"
 }

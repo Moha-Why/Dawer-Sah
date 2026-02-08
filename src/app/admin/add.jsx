@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { supabase } from "@/lib/supabaseClient"
 import { motion, AnimatePresence } from "framer-motion"
 
 // Animation variants
@@ -26,97 +25,71 @@ const inputVariants = {
   }
 }
 
-export default function AddProductWithRevalidation() {
+export default function AddVehicle() {
   const [name, setName] = useState("")
   const [price, setPrice] = useState("")
   const [description, setDescription] = useState("")
-  const [sizes, setSizes] = useState([])
   const [type, setType] = useState("")
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [newprice, setNewprice] = useState("")
-  const [uploadingImages, setUploadingImages] = useState(false)
 
-  // Color-image mapping: { "burgundy": { files: [File], previews: ["blob:..."] }, ... }
+  // Car-specific fields
+  const [brand, setBrand] = useState("")
+  const [year, setYear] = useState("")
+  const [mileage, setMileage] = useState("")
+  const [transmission, setTransmission] = useState("")
+  const [fuelType, setFuelType] = useState("")
+  const [engineSize, setEngineSize] = useState("")
+  const [features, setFeatures] = useState("")
+
+  // Color-image mapping: { "black": { urls: ["https://..."] }, ... }
   const [colorImageMap, setColorImageMap] = useState({})
   const [showColorPicker, setShowColorPicker] = useState(false)
 
   const colorOptions = [
-    "white","black","red","blue","green","yellow","orange","purple",
-    "pink","brown","gray","beige","cyan","magenta","lime","indigo",
-    "violet","turquoise","gold","silver","navy","maroon","olive","teal"
+    "black", "white", "silver", "gray", "red", "blue",
+    "green", "brown", "beige", "navy", "maroon"
   ]
   const popularColorOptions = [
-    "rose gold","blush pink","coral","dusty rose","mauve","burgundy",
-    "wine","champagne","ivory","cream","nude","camel","tan","taupe",
-    "khaki","mint","sage","emerald","forest green","lavender","lilac",
-    "periwinkle","cobalt","powder blue","baby blue","rust","terracotta",
-    "peach","apricot","mustard","off white","charcoal","hot pink",
-    "crimson","copper","bronze","plum","seafoam","sky blue"
+    "pearl white", "metallic gray", "champagne gold", "midnight blue",
+    "racing red", "charcoal", "bronze", "deep black"
   ]
   const colorHexMap = {
-    "rose gold": "#B76E79",
-    "blush pink": "#F4C2C2",
-    "coral": "#FF7F50",
-    "dusty rose": "#DCAE96",
-    "mauve": "#E0B0FF",
-    "burgundy": "#800020",
-    "wine": "#722F37",
-    "champagne": "#F7E7CE",
-    "ivory": "#FFFFF0",
-    "cream": "#FFFDD0",
-    "nude": "#E3BC9A",
-    "camel": "#C19A6B",
-    "tan": "#D2B48C",
-    "taupe": "#483C32",
-    "khaki": "#C3B091",
-    "mint": "#98FF98",
-    "sage": "#BCB88A",
-    "emerald": "#50C878",
-    "forest green": "#228B22",
-    "lavender": "#E6E6FA",
-    "lilac": "#C8A2C8",
-    "periwinkle": "#CCCCFF",
-    "cobalt": "#0047AB",
-    "powder blue": "#B0E0E6",
-    "baby blue": "#89CFF0",
-    "rust": "#B7410E",
-    "terracotta": "#E2725B",
-    "peach": "#FFCBA4",
-    "apricot": "#FBCEB1",
-    "mustard": "#FFDB58",
-    "off white": "#FAF9F6",
+    "black": "#000000",
+    "white": "#FFFFFF",
+    "silver": "#C0C0C0",
+    "gray": "#808080",
+    "red": "#FF0000",
+    "blue": "#0000FF",
+    "green": "#006400",
+    "brown": "#8B4513",
+    "beige": "#F5F5DC",
+    "navy": "#000080",
+    "maroon": "#800000",
+    "pearl white": "#F0EAD6",
+    "metallic gray": "#A8A9AD",
+    "champagne gold": "#F7E7CE",
+    "midnight blue": "#191970",
+    "racing red": "#D40000",
     "charcoal": "#36454F",
-    "hot pink": "#FF69B4",
-    "crimson": "#DC143C",
-    "copper": "#B87333",
     "bronze": "#CD7F32",
-    "plum": "#8E4585",
-    "seafoam": "#93E9BE",
-    "sky blue": "#87CEEB",
+    "deep black": "#0A0A0A",
   }
   const getColorValue = (color) => colorHexMap[color] || color
 
-  const sizeOptions = ["S", "M", "L", "XL"]
-  const typeOptions = ["dress", "casual", "bag"]
-
-  const isBag = type.toLowerCase() === "bag"
-
-  const handleTypeChange = (newType) => {
-    setType(newType)
-    if (newType.toLowerCase() === "bag") {
-      setSizes([])
-    }
-  }
-
-  const handleSizeToggle = (size) => {
-    setSizes(prev => prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size])
-  }
+  const typeOptions = ["sedan", "suv", "hatchback", "truck", "coupe", "van"]
+  const brandOptions = [
+    "Toyota", "BMW", "Mercedes-Benz", "Honda", "Hyundai",
+    "Kia", "Nissan", "Chevrolet", "Ford", "Volkswagen"
+  ]
+  const transmissionOptions = ["Automatic", "Manual"]
+  const fuelTypeOptions = ["Gasoline", "Diesel", "Hybrid", "Electric"]
 
   // Color-image helpers
   const addColor = (color) => {
     if (!colorImageMap[color]) {
-      setColorImageMap(prev => ({ ...prev, [color]: { files: [], previews: [] } }))
+      setColorImageMap(prev => ({ ...prev, [color]: { urls: [] } }))
     }
     setShowColorPicker(false)
   }
@@ -124,106 +97,36 @@ export default function AddProductWithRevalidation() {
   const removeColor = (color) => {
     setColorImageMap(prev => {
       const newMap = { ...prev }
-      newMap[color]?.previews.forEach(url => URL.revokeObjectURL(url))
       delete newMap[color]
       return newMap
     })
   }
 
-  // Image resize function
-  const resizeImage = (file, targetWidth = 768, targetHeight = 950) => {
-    return new Promise((resolve) => {
-      const img = new Image()
-      const reader = new FileReader()
-      reader.onload = (e) => { img.src = e.target.result }
-      img.onload = () => {
-        const canvas = document.createElement("canvas")
-        const ctx = canvas.getContext("2d")
-        canvas.width = targetWidth
-        canvas.height = targetHeight
-        ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
-        canvas.toBlob((blob) => {
-          const resizedFile = new File([blob], file.name, { type: file.type, lastModified: Date.now() })
-          resolve(resizedFile)
-        }, file.type, 0.8)
-      }
-      reader.readAsDataURL(file)
-    })
+  const handleColorUrlChange = (color, text) => {
+    const urls = text
+      .split("\n")
+      .map(u => u.trim())
+      .filter(u => u.length > 0)
+    setColorImageMap(prev => ({
+      ...prev,
+      [color]: { urls }
+    }))
   }
 
-  const handleColorFileChange = async (color, e) => {
-    const selectedFiles = Array.from(e.target.files)
-    if (selectedFiles.length === 0) return
-
-    setUploadingImages(true)
-    setMessage("Processing images...")
-
-    try {
-      const resizedFiles = []
-      const previews = []
-
-      for (let file of selectedFiles) {
-        if (!file.type.startsWith('image/')) continue
-        if (file.size > 5242880) {
-          setMessage(`File ${file.name} is too large (max 5MB)`)
-          continue
-        }
-        const resizedFile = await resizeImage(file)
-        resizedFiles.push(resizedFile)
-        previews.push(URL.createObjectURL(resizedFile))
-      }
-
-      setColorImageMap(prev => ({
-        ...prev,
-        [color]: {
-          files: [...prev[color].files, ...resizedFiles],
-          previews: [...prev[color].previews, ...previews]
-        }
-      }))
-      setMessage("")
-    } catch (error) {
-      console.error('Image processing error:', error)
-      setMessage("Error processing images: " + error.message)
-    } finally {
-      setUploadingImages(false)
-      e.target.value = ''
-    }
+  const getColorUrlText = (color) => {
+    return (colorImageMap[color]?.urls || []).join("\n")
   }
 
   const removeImageFromColor = (color, index) => {
     setColorImageMap(prev => {
       const entry = prev[color]
-      URL.revokeObjectURL(entry.previews[index])
       return {
         ...prev,
         [color]: {
-          files: entry.files.filter((_, i) => i !== index),
-          previews: entry.previews.filter((_, i) => i !== index)
+          urls: entry.urls.filter((_, i) => i !== index)
         }
       }
     })
-  }
-
-  const uploadFilesToStorage = async (files) => {
-    const urls = []
-    for (let file of files) {
-      try {
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`
-        const { error } = await supabase.storage
-          .from("product-images")
-          .upload(fileName, file, { cacheControl: '3600', upsert: false })
-        if (error) {
-          console.error('Upload error:', error)
-          continue
-        }
-        const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName)
-        if (urlData?.publicUrl) urls.push(urlData.publicUrl)
-      } catch (error) {
-        console.error(`Error uploading ${file.name}:`, error)
-      }
-    }
-    return urls
   }
 
   const handleSubmit = async (e) => {
@@ -232,36 +135,36 @@ export default function AddProductWithRevalidation() {
     setMessage("")
 
     const colorNames = Object.keys(colorImageMap)
-    const totalFiles = Object.values(colorImageMap).reduce((sum, entry) => sum + entry.files.length, 0)
+    const totalUrls = Object.values(colorImageMap).reduce((sum, entry) => sum + entry.urls.length, 0)
 
-    if (!name || !price || colorNames.length === 0 || totalFiles === 0 || (!isBag && sizes.length === 0) || !type) {
-      setMessage("Please fill in all required fields. Each color needs at least one image.")
+    if (!name || !price || !type || !brand || !year || !mileage || colorNames.length === 0 || totalUrls === 0) {
+      setMessage("Please fill in all required fields (name, price, type, brand, year, mileage) and add at least one color with images.")
       setLoading(false)
       return
     }
 
     try {
-      setMessage("Uploading images...")
+      setMessage("Saving vehicle...")
 
-      // Upload images per color and build the color_images map
+      // Build color_images map from URLs
       const colorImagesResult = {}
       for (const [color, entry] of Object.entries(colorImageMap)) {
-        if (entry.files.length === 0) continue
-        const urls = await uploadFilesToStorage(entry.files)
-        if (urls.length > 0) {
-          colorImagesResult[color] = urls
-        }
+        if (entry.urls.length === 0) continue
+        colorImagesResult[color] = entry.urls
       }
 
       if (Object.keys(colorImagesResult).length === 0) {
-        setMessage("No images were uploaded successfully. Please try again.")
+        setMessage("Each color must have at least one image URL. Please add image URLs.")
         setLoading(false)
         return
       }
 
-      setMessage("Creating product...")
+      // Parse features from comma-separated string to array
+      const featuresArray = features
+        ? features.split(",").map(f => f.trim()).filter(f => f.length > 0)
+        : []
 
-      const product = {
+      const vehicle = {
         name,
         price: Number(price),
         newprice: newprice ? Number(newprice) : null,
@@ -269,43 +172,46 @@ export default function AddProductWithRevalidation() {
         color_images: colorImagesResult,
         colors: Object.keys(colorImagesResult),
         pictures: Object.values(colorImagesResult).flat(),
-        sizes: isBag ? [] : sizes,
         type,
+        brand,
+        year: Number(year),
+        mileage: Number(mileage),
+        transmission,
+        fuelType,
+        engineSize,
+        features: featuresArray,
         owner_id: "dev-user-123"
       }
 
       const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product),
+        body: JSON.stringify(vehicle),
       })
 
       const result = await res.json()
 
       if (res.ok) {
-        // Clean preview URLs from memory
-        Object.values(colorImageMap).forEach(entry =>
-          entry.previews.forEach(url => URL.revokeObjectURL(url))
-        )
-
         // Reset form
         setName("")
         setPrice("")
         setNewprice("")
         setDescription("")
         setColorImageMap({})
-        setSizes([])
         setType("")
+        setBrand("")
+        setYear("")
+        setMileage("")
+        setTransmission("")
+        setFuelType("")
+        setEngineSize("")
+        setFeatures("")
 
-        setMessage(`✅ "${name}" saved to database successfully!
-
-🚨 IMPORTANT: Go back to Dashboard tab and click "Update Website" button to make this product visible to customers.
-
-The product is saved but NOT live yet - you control when it goes public.`)
+        setMessage(`"${name}" saved to database successfully!\n\nIMPORTANT: Go back to Dashboard tab and click "Update Website" button to make this vehicle visible to customers.\n\nThe vehicle is saved but NOT live yet - you control when it goes public.`)
 
         setTimeout(() => setMessage(""), 15000)
       } else {
-        setMessage("Error: " + (result.error || "Error adding product"))
+        setMessage("Error: " + (result.error || "Error adding vehicle"))
         setTimeout(() => setMessage(""), 5000)
       }
     } catch (err) {
@@ -335,7 +241,7 @@ The product is saved but NOT live yet - you control when it goes public.`)
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        Add New Product
+        Add New Vehicle
       </motion.h1>
 
       {/* Manual Update Notice */}
@@ -344,25 +250,109 @@ The product is saved but NOT live yet - you control when it goes public.`)
         variants={inputVariants}
       >
         <h4 className="font-semibold mb-2 flex items-center gap-2">
-          <span>💡</span>
-          Manual Update System Active
+          <span>Dawer Sah - Vehicle Inventory</span>
         </h4>
         <ul className="space-y-1 text-xs">
-          <li>• Product will be saved to database</li>
-          <li>• <strong>NOT visible to customers yet</strong></li>
-          <li>• Click "Update Website" in Dashboard to publish</li>
-          <li>• You have full control over when changes go live</li>
+          <li>Vehicle will be saved to database</li>
+          <li><strong>NOT visible to customers yet</strong></li>
+          <li>Click &quot;Update Website&quot; in Dashboard to publish</li>
+          <li>You have full control over when changes go live</li>
         </ul>
       </motion.div>
 
-      {/* Product Name */}
+      {/* Vehicle Name */}
       <motion.input
         type="text"
-        placeholder="Product Name *"
+        placeholder="Vehicle Name * (e.g. Toyota Camry 2020)"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="p-3 border rounded-md w-full focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent"
         required
+        variants={inputVariants}
+      />
+
+      {/* Brand */}
+      <motion.div variants={inputVariants}>
+        <p className="mb-2 font-semibold text-gray-700">Brand *:</p>
+        <select
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
+          className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent bg-white"
+          required
+        >
+          <option value="">Select Brand</option>
+          {brandOptions.map((b) => (
+            <option key={b} value={b}>{b}</option>
+          ))}
+        </select>
+      </motion.div>
+
+      {/* Year & Mileage Row */}
+      <motion.div className="grid grid-cols-2 gap-3" variants={inputVariants}>
+        <div>
+          <p className="mb-2 font-semibold text-gray-700 text-sm">Year *:</p>
+          <input
+            type="number"
+            placeholder="e.g. 2020"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent"
+            required
+            min="1990"
+            max="2030"
+          />
+        </div>
+        <div>
+          <p className="mb-2 font-semibold text-gray-700 text-sm">Mileage (km) *:</p>
+          <input
+            type="number"
+            placeholder="e.g. 45000"
+            value={mileage}
+            onChange={(e) => setMileage(e.target.value)}
+            className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent"
+            required
+            min="0"
+          />
+        </div>
+      </motion.div>
+
+      {/* Transmission & Fuel Type Row */}
+      <motion.div className="grid grid-cols-2 gap-3" variants={inputVariants}>
+        <div>
+          <p className="mb-2 font-semibold text-gray-700 text-sm">Transmission:</p>
+          <select
+            value={transmission}
+            onChange={(e) => setTransmission(e.target.value)}
+            className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent bg-white"
+          >
+            <option value="">Select</option>
+            {transmissionOptions.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <p className="mb-2 font-semibold text-gray-700 text-sm">Fuel Type:</p>
+          <select
+            value={fuelType}
+            onChange={(e) => setFuelType(e.target.value)}
+            className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent bg-white"
+          >
+            <option value="">Select</option>
+            {fuelTypeOptions.map((f) => (
+              <option key={f} value={f}>{f}</option>
+            ))}
+          </select>
+        </div>
+      </motion.div>
+
+      {/* Engine Size */}
+      <motion.input
+        type="text"
+        placeholder="Engine Size (e.g. 2.5L)"
+        value={engineSize}
+        onChange={(e) => setEngineSize(e.target.value)}
+        className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent"
         variants={inputVariants}
       />
 
@@ -372,44 +362,56 @@ The product is saved but NOT live yet - you control when it goes public.`)
         placeholder="Price *"
         value={price}
         onChange={(e) => setPrice(e.target.value)}
-        className="p-3 border rounded-md w-full focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent"
         required
         variants={inputVariants}
       />
 
-      {/* New Price */}
+      {/* Sale Price */}
       <motion.input
         type="number"
         placeholder="Sale Price (optional)"
         value={newprice}
         onChange={(e) => setNewprice(e.target.value)}
-        className="p-3 border rounded-md w-full focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent"
         variants={inputVariants}
       />
 
       {/* Description */}
       <motion.textarea
-        placeholder="Description (optional)"
+        placeholder="Vehicle Description (optional)"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         rows={4}
-        className="p-3 border rounded-md w-full focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-vertical"
+        className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent resize-vertical"
         variants={inputVariants}
       />
 
+      {/* Features */}
+      <motion.div variants={inputVariants}>
+        <p className="mb-2 font-semibold text-gray-700">Features (comma-separated):</p>
+        <input
+          type="text"
+          placeholder="e.g. Sunroof, Leather Seats, Bluetooth, Backup Camera"
+          value={features}
+          onChange={(e) => setFeatures(e.target.value)}
+          className="p-3 border rounded-md w-full focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent"
+        />
+      </motion.div>
+
       {/* Type */}
       <motion.div variants={inputVariants}>
-        <p className="mb-2 font-semibold text-gray-700">Type (required) *:</p>
+        <p className="mb-2 font-semibold text-gray-700">Vehicle Type (required) *:</p>
         <div className="flex flex-wrap gap-2">
           {typeOptions.map((t) => (
             <motion.button
               key={t}
               type="button"
-              onClick={() => handleTypeChange(t)}
+              onClick={() => setType(t)}
               className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
                 type === t
-                  ? "bg-purple-600 text-white shadow-lg"
-                  : "bg-gray-100 text-gray-700 hover:bg-purple-100 hover:text-purple-700"
+                  ? "bg-[#1B2A4A] text-white shadow-lg"
+                  : "bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-[#1B2A4A]"
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -420,39 +422,6 @@ The product is saved but NOT live yet - you control when it goes public.`)
         </div>
       </motion.div>
 
-      {/* Sizes */}
-      <AnimatePresence>
-        {!isBag && (
-          <motion.div
-            variants={inputVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            transition={{ duration: 0.3 }}
-          >
-            <p className="mb-2 font-semibold text-gray-700">Sizes (required) *:</p>
-            <div className="flex flex-wrap gap-2">
-              {sizeOptions.map((size) => (
-                <motion.button
-                  key={size}
-                  type="button"
-                  onClick={() => handleSizeToggle(size)}
-                  className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
-                    sizes.includes(size)
-                      ? "bg-purple-600 text-white shadow-lg"
-                      : "bg-gray-100 text-gray-700 hover:bg-purple-100 hover:text-purple-700"
-                  }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {size}
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Color & Images Section */}
       <motion.div variants={inputVariants}>
         <div className="flex items-center justify-between mb-3">
@@ -460,7 +429,7 @@ The product is saved but NOT live yet - you control when it goes public.`)
           <motion.button
             type="button"
             onClick={() => setShowColorPicker(!showColorPicker)}
-            className="px-4 py-2 bg-purple-600 text-white rounded-full text-sm font-medium hover:bg-purple-700 transition-colors"
+            className="px-4 py-2 bg-[#1B2A4A] text-white rounded-full text-sm font-medium hover:bg-[#2C3E6B] transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -472,7 +441,7 @@ The product is saved but NOT live yet - you control when it goes public.`)
         <AnimatePresence>
           {showColorPicker && (
             <motion.div
-              className="mb-4 border-2 border-purple-200 rounded-lg p-3 bg-white shadow-lg max-h-60 overflow-y-auto"
+              className="mb-4 border-2 border-[#1B2A4A]/20 rounded-lg p-3 bg-white shadow-lg max-h-60 overflow-y-auto"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -480,7 +449,7 @@ The product is saved but NOT live yet - you control when it goes public.`)
             >
               {availableGeneralColors.length > 0 && (
                 <>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">General Colors</p>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Standard Colors</p>
                   <div className="grid grid-cols-4 gap-1.5 mb-3">
                     {availableGeneralColors.map((color) => (
                       <motion.button
@@ -491,7 +460,7 @@ The product is saved but NOT live yet - you control when it goes public.`)
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <span className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0" style={{ backgroundColor: color }}></span>
+                        <span className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0" style={{ backgroundColor: getColorValue(color) }}></span>
                         <span className="capitalize text-xs truncate">{color}</span>
                       </motion.button>
                     ))}
@@ -501,7 +470,7 @@ The product is saved but NOT live yet - you control when it goes public.`)
               {availablePopularColors.length > 0 && (
                 <>
                   <div className="border-t border-gray-200 my-2"></div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Popular Colors</p>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Popular Car Colors</p>
                   <div className="grid grid-cols-3 gap-1.5">
                     {availablePopularColors.map((color) => (
                       <motion.button
@@ -526,14 +495,13 @@ The product is saved but NOT live yet - you control when it goes public.`)
         {/* Color Cards */}
         {selectedColors.length === 0 && (
           <p className="text-sm text-gray-400 text-center py-4 border-2 border-dashed border-gray-200 rounded-lg">
-            No colors added yet. Click "Add Color" to start.
+            No colors added yet. Click &quot;Add Color&quot; to start.
           </p>
         )}
 
         <div className="space-y-4">
           {selectedColors.map((color) => {
             const entry = colorImageMap[color]
-            const inputId = `color-upload-${color.replace(/\s+/g, '-')}`
             return (
               <motion.div
                 key={color}
@@ -551,7 +519,7 @@ The product is saved but NOT live yet - you control when it goes public.`)
                       style={{ backgroundColor: getColorValue(color) }}
                     ></span>
                     <span className="font-semibold capitalize text-gray-800">{color}</span>
-                    <span className="text-xs text-gray-500">({entry.files.length} image{entry.files.length !== 1 ? 's' : ''})</span>
+                    <span className="text-xs text-gray-500">({entry.urls.length} image{entry.urls.length !== 1 ? "s" : ""})</span>
                   </div>
                   <motion.button
                     type="button"
@@ -564,15 +532,16 @@ The product is saved but NOT live yet - you control when it goes public.`)
                   </motion.button>
                 </div>
 
-                {/* Image Previews */}
-                {entry.previews.length > 0 && (
+                {/* Image URL Previews */}
+                {entry.urls.length > 0 && (
                   <div className="grid grid-cols-4 gap-2 mb-3">
-                    {entry.previews.map((url, i) => (
+                    {entry.urls.map((url, i) => (
                       <div key={i} className="relative group">
                         <img
                           src={url}
                           alt={`${color} ${i + 1}`}
                           className="w-full h-20 object-cover rounded-lg border border-gray-200"
+                          onError={(e) => { e.target.src = ""; e.target.alt = "Invalid URL" }}
                         />
                         <motion.button
                           type="button"
@@ -581,33 +550,24 @@ The product is saved but NOT live yet - you control when it goes public.`)
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                         >
-                          ×
+                          x
                         </motion.button>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Upload Button */}
-                <div className="border border-dashed border-gray-300 rounded-lg p-3 text-center hover:border-purple-400 transition-colors">
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={(e) => handleColorFileChange(color, e)}
-                    className="hidden"
-                    id={inputId}
-                    disabled={uploadingImages}
+                {/* URL Input */}
+                <div className="border border-dashed border-gray-300 rounded-lg p-3 hover:border-[#1B2A4A] transition-colors">
+                  <p className="text-xs font-medium text-[#1B2A4A] mb-1">Paste image URLs (one per line):</p>
+                  <textarea
+                    rows={3}
+                    value={getColorUrlText(color)}
+                    onChange={(e) => handleColorUrlChange(color, e.target.value)}
+                    placeholder={"https://example.com/car-front.jpg\nhttps://example.com/car-side.jpg"}
+                    className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent resize-vertical"
                   />
-                  <label
-                    htmlFor={inputId}
-                    className={`cursor-pointer text-purple-600 hover:text-purple-700 font-medium text-sm ${
-                      uploadingImages ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {uploadingImages ? 'Processing...' : `📷 Add images for ${color}`}
-                  </label>
-                  <p className="text-xs text-gray-400 mt-1">Max 5MB each, auto-resized to 768x950px</p>
+                  <p className="text-xs text-gray-400 mt-1">Enter one image URL per line</p>
                 </div>
               </motion.div>
             )
@@ -620,9 +580,9 @@ The product is saved but NOT live yet - you control when it goes public.`)
         {message && (
           <motion.div
             className={`p-4 rounded-lg text-center font-medium whitespace-pre-line ${
-              message.includes("successfully") || message.includes("✅")
+              message.includes("successfully")
                 ? "text-green-700 bg-green-50 border border-green-200"
-                : message.includes("Processing") || message.includes("Uploading") || message.includes("Creating")
+                : message.includes("Saving")
                 ? "text-blue-700 bg-blue-50 border border-blue-200"
                 : "text-red-700 bg-red-50 border border-red-200"
             }`}
@@ -639,15 +599,15 @@ The product is saved but NOT live yet - you control when it goes public.`)
       {/* Submit Button */}
       <motion.button
         type="submit"
-        disabled={loading || uploadingImages}
+        disabled={loading}
         className={`mt-4 py-4 px-6 rounded-lg font-semibold text-lg transition-all ${
-          loading || uploadingImages
+          loading
             ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-            : "bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl"
+            : "bg-[#1B2A4A] hover:bg-[#2C3E6B] text-white shadow-lg hover:shadow-xl"
         }`}
         variants={inputVariants}
-        whileHover={!loading && !uploadingImages ? { scale: 1.02, y: -2 } : {}}
-        whileTap={!loading && !uploadingImages ? { scale: 0.98 } : {}}
+        whileHover={!loading ? { scale: 1.02, y: -2 } : {}}
+        whileTap={!loading ? { scale: 0.98 } : {}}
       >
         <AnimatePresence mode="wait">
           <motion.span
@@ -665,12 +625,10 @@ The product is saved but NOT live yet - you control when it goes public.`)
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                 />
-                Adding Product...
+                Adding Vehicle...
               </>
-            ) : uploadingImages ? (
-              "Processing Images..."
             ) : (
-              "💾 Save Product to Database"
+              "Save Vehicle"
             )}
           </motion.span>
         </AnimatePresence>
@@ -682,10 +640,9 @@ The product is saved but NOT live yet - you control when it goes public.`)
         variants={inputVariants}
       >
         <div className="flex items-start gap-2">
-          <span className="text-lg">⚠️</span>
           <div>
             <div className="font-medium mb-1">Remember:</div>
-            <div>Product will be saved to database but <strong>NOT visible to customers</strong> until you click "Update Website" in the Dashboard.</div>
+            <div>Vehicle will be saved to database but <strong>NOT visible to customers</strong> until you click &quot;Update Website&quot; in the Dashboard.</div>
           </div>
         </div>
       </motion.div>

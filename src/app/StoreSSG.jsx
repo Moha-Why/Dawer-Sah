@@ -23,63 +23,38 @@ const itemVariants = {
 /**
  * Store Component محسن للـ SSG بدون Hydration Issues
  */
-export default function StoreSSG({ 
-  initialProducts = [], 
-  initialSaleProducts = [], 
-  initialCategories = [] 
+export default function StoreSSG({
+  initialProducts = [],
+  initialSaleProducts = [],
+  initialCategories = []
 }) {
   // States للفلاتر
   const [typeFilter, setTypeFilter] = useState("")
   const [colorFilter, setColorFilter] = useState("")
-  const [sizeFilter, setSizeFilter] = useState("")
+  const [brandFilter, setBrandFilter] = useState("")
+  const [transmissionFilter, setTransmissionFilter] = useState("")
   const [minPrice, setMinPrice] = useState("")
   const [maxPrice, setMaxPrice] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [showFilters, setShowFilters] = useState(false)
   const [sortBy, setSortBy] = useState("newest")
-  const [hoveredId, setHoveredId] = useState(null)
 
-  // Hex mapping for non-standard CSS color names
+  // Hex mapping for car color names
   const colorHexMap = {
-    "rose gold": "#B76E79",
-    "blush pink": "#F4C2C2",
-    "coral": "#FF7F50",
-    "dusty rose": "#DCAE96",
-    "mauve": "#E0B0FF",
-    "burgundy": "#800020",
-    "wine": "#722F37",
-    "champagne": "#F7E7CE",
-    "ivory": "#FFFFF0",
-    "cream": "#FFFDD0",
-    "nude": "#E3BC9A",
-    "camel": "#C19A6B",
-    "tan": "#D2B48C",
-    "taupe": "#483C32",
-    "khaki": "#C3B091",
-    "mint": "#98FF98",
-    "sage": "#BCB88A",
-    "emerald": "#50C878",
-    "forest green": "#228B22",
-    "lavender": "#E6E6FA",
-    "lilac": "#C8A2C8",
-    "periwinkle": "#CCCCFF",
-    "cobalt": "#0047AB",
-    "powder blue": "#B0E0E6",
-    "baby blue": "#89CFF0",
-    "rust": "#B7410E",
-    "terracotta": "#E2725B",
-    "peach": "#FFCBA4",
-    "apricot": "#FBCEB1",
-    "mustard": "#FFDB58",
-    "off white": "#FAF9F6",
-    "charcoal": "#36454F",
-    "hot pink": "#FF69B4",
-    "crimson": "#DC143C",
-    "copper": "#B87333",
-    "bronze": "#CD7F32",
-    "plum": "#8E4585",
-    "seafoam": "#93E9BE",
-    "sky blue": "#87CEEB",
+    "black": "#000000",
+    "white": "#FFFFFF",
+    "silver": "#C0C0C0",
+    "gray": "#808080",
+    "red": "#FF0000",
+    "blue": "#0000FF",
+    "green": "#008000",
+    "brown": "#8B4513",
+    "beige": "#F5F5DC",
+    "pearl white": "#F0EAD6",
+    "metallic gray": "#A8A9AD",
+    "champagne gold": "#F7E7CE",
+    "navy": "#000080",
+    "maroon": "#800000",
   }
   const getColorValue = (color) => colorHexMap[color] || color
 
@@ -92,24 +67,25 @@ export default function StoreSSG({
     return Array.from(colorSet).sort()
   }, [initialProducts])
 
+  // Extract unique brands from all products for dynamic filter
+  const availableBrands = useMemo(() => {
+    const brandSet = new Set()
+    initialProducts.forEach(product => {
+      if (product.brand) brandSet.add(product.brand)
+    })
+    return Array.from(brandSet).sort()
+  }, [initialProducts])
+
   console.log(`🏪 StoreSSG rendered with ${initialProducts.length} products`)
 
   // Product Image Component مع fallback محسن بدون hydration issues
-  const ProductImage = ({ product, isHovered, className, priority = false }) => {
+  const ProductImage = ({ product, className, priority = false }) => {
     const [imageSrc, setImageSrc] = useState(product.pictures?.[0] || "/placeholder.png")
     const [imageError, setImageError] = useState(false)
 
-    useEffect(() => {
-      if (isHovered && product.pictures?.[1]) {
-        setImageSrc(product.pictures[1])
-      } else if (product.pictures?.[0]) {
-        setImageSrc(product.pictures[0])
-      }
-    }, [isHovered, product.pictures])
-
     const handleError = () => {
       if (!imageError) {
-        setImageSrc('https://dfurfmrwpyotjfrryatn.supabase.co/storage/v1/object/public/product-images/casual.png')
+        setImageSrc('/placeholder.png')
         setImageError(true)
       }
     }
@@ -133,7 +109,8 @@ export default function StoreSSG({
       return (
         (!typeFilter || product.type === typeFilter) &&
         (!colorFilter || product.colors?.includes(colorFilter)) &&
-        (!sizeFilter || product.sizes?.includes(sizeFilter)) &&
+        (!brandFilter || product.brand === brandFilter) &&
+        (!transmissionFilter || product.transmission === transmissionFilter) &&
         (!minPrice || (product.newprice || product.price) >= parseFloat(minPrice)) &&
         (!maxPrice || (product.newprice || product.price) <= parseFloat(maxPrice)) &&
         (!searchTerm || product.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -149,16 +126,21 @@ export default function StoreSSG({
           return (b.newprice || b.price) - (a.newprice || a.price)
         case "name":
           return a.name.localeCompare(b.name)
+        case "year-new":
+          return (b.year || 0) - (a.year || 0)
+        case "mileage-low":
+          return (a.mileage || 0) - (b.mileage || 0)
         default:
           return b.id - a.id // newest first
       }
     })
-  }, [initialProducts, typeFilter, colorFilter, sizeFilter, minPrice, maxPrice, searchTerm, sortBy])
+  }, [initialProducts, typeFilter, colorFilter, brandFilter, transmissionFilter, minPrice, maxPrice, searchTerm, sortBy])
 
   const clearAllFilters = () => {
     setTypeFilter("")
     setColorFilter("")
-    setSizeFilter("")
+    setBrandFilter("")
+    setTransmissionFilter("")
     setMinPrice("")
     setMaxPrice("")
     setSortBy("newest")
@@ -177,7 +159,7 @@ export default function StoreSSG({
   // ✅ إزالة الـ loading state المسبب للـ hydration mismatch
   // Show content directly بدلاً من الـ mounted check
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -186,9 +168,9 @@ export default function StoreSSG({
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">Our Collection</h1>
-          <p className="text-xl text-gray-600 mb-8">Discover the latest trends and timeless classics</p>
-          
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">Our Inventory</h1>
+          <p className="text-xl text-gray-600 mb-8">Browse quality pre-owned vehicles</p>
+
           {/* Search Bar */}
           <div className="max-w-md mx-auto relative">
             <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,7 +178,7 @@ export default function StoreSSG({
             </svg>
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder="Search cars..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-center"
@@ -210,13 +192,13 @@ export default function StoreSSG({
             <motion.div variants={itemVariants} className="text-center mb-8">
               <div className="inline-flex items-center gap-3 bg text-white px-6 py-3 rounded-full mb-4">
                 <FaFire className="text-xl text-black" />
-                <span className="text-lg font-bold  text-black">SALE UP TO 50% OFF</span>
+                <span className="text-lg font-bold  text-black">SPECIAL DEALS</span>
                 <FaFire className="text-xl text-black" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Hot Deals</h2>
-              <p className="text-gray-600">Limited time offers on selected items</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Best Offers</h2>
+              <p className="text-gray-600">Special prices on selected vehicles</p>
             </motion.div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {initialSaleProducts.map((product, index) => (
                 <Link href={`/product/${product.id}`} key={`sale-${product.id}`}>
@@ -224,8 +206,6 @@ export default function StoreSSG({
                     variants={itemVariants}
                     whileHover={{ y: -4, scale: 1.02 }}
                     className="group rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 relative cursor-pointer"
-                    onMouseEnter={() => setHoveredId(`sale-${product.id}`)}
-                    onMouseLeave={() => setHoveredId(null)}
                   >
                     {/* Hot Deal Badge */}
                     <div className="absolute top-3 left-3 bg text-black px-3 py-1 rounded-full text-xs font-bold z-10 flex items-center gap-1">
@@ -237,7 +217,6 @@ export default function StoreSSG({
                     <div className="relative overflow-hidden bg-white h-96">
                       <ProductImage
                         product={product}
-                        isHovered={hoveredId === `sale-${product.id}`}
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                         priority={index < 2}
                       />
@@ -248,7 +227,7 @@ export default function StoreSSG({
                       <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm">
                         {product.name}
                       </h3>
-                      
+
                       <div className="flex items-center gap-2 mb-3">
                         <span className="text-lg font-bold text">
                           {product.newprice} LE
@@ -259,7 +238,7 @@ export default function StoreSSG({
                       </div>
 
                       <div className="w-full bg text-black py-2 rounded-lg text-center text-sm font-medium transition-all">
-                        Shop Now
+                        View Details
                       </div>
                     </div>
                   </motion.div>
@@ -271,8 +250,8 @@ export default function StoreSSG({
 
         {/* Categories Section */}
         <motion.div variants={containerVariants} className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Shop by Category</h2>
-          
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Browse by Type</h2>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {initialCategories.map((category) => (
               <motion.div
@@ -291,17 +270,17 @@ export default function StoreSSG({
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
-                  
+
                   <div className="absolute inset-0 bg-gray-900/30 opacity-80" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-                  
+
                   <div className="absolute inset-0 flex items-center justify-center text-center text-white z-10 p-6">
                     <div>
                       <h3 className="text-2xl font-bold mb-2">{category.name}</h3>
                       <p className="text-sm opacity-90">{category.count} items</p>
                     </div>
                   </div>
-                  
+
                   {typeFilter === category.key && (
                     <div className="absolute top-4 right-4 bg-white text-black px-3 py-1 rounded-full text-sm font-bold shadow-lg">
                       Active
@@ -341,7 +320,7 @@ export default function StoreSSG({
 <div className="flex flex-wrap items-center gap-3 mb-4">
   {/* Accessible label for select */}
   <label htmlFor="sort" className="sr-only">
-    Sort products
+    Sort vehicles
   </label>
   <select
     id="sort"
@@ -353,6 +332,8 @@ export default function StoreSSG({
     <option value="price-low">Price: Low to High</option>
     <option value="price-high">Price: High to Low</option>
     <option value="name">Name A-Z</option>
+    <option value="year-new">Year: Newest First</option>
+    <option value="mileage-low">Mileage: Low to High</option>
   </select>
 
   <div className="ml-auto flex gap-3">
@@ -367,7 +348,7 @@ export default function StoreSSG({
 
 
 
-                
+
                 <button
                   className="p-3 rounded-full hover:bg-white transition-colors"
                   onClick={() => setShowFilters(!showFilters)}
@@ -402,15 +383,26 @@ export default function StoreSSG({
                     </select>
 
                     <select
-                      value={sizeFilter}
-                      onChange={(e) => setSizeFilter(e.target.value)}
+                      value={brandFilter}
+                      onChange={(e) => setBrandFilter(e.target.value)}
                       className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                     >
-                      <option value="">All Sizes</option>
-                      <option value="S">Small</option>
-                      <option value="M">Medium</option>
-                      <option value="L">Large</option>
-                      <option value="XL">Extra Large</option>
+                      <option value="">All Brands</option>
+                      {availableBrands.map((brand) => (
+                        <option key={brand} value={brand}>
+                          {brand}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={transmissionFilter}
+                      onChange={(e) => setTransmissionFilter(e.target.value)}
+                      className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    >
+                      <option value="">All Transmissions</option>
+                      <option value="Automatic">Automatic</option>
+                      <option value="Manual">Manual</option>
                     </select>
 
                     <div className="flex items-center gap-3">
@@ -440,7 +432,7 @@ export default function StoreSSG({
           {/* Results Counter */}
           <div className="flex justify-between items-center mb-6">
             <p className="text-gray-600">
-              Showing <span className="font-semibold">{filteredProducts.length}</span> of <span className="font-semibold">{initialProducts.length}</span> products
+              Showing <span className="font-semibold">{filteredProducts.length}</span> of <span className="font-semibold">{initialProducts.length}</span> vehicles
               {typeFilter && (
                 <span className="ml-2 text-sm">
                   in <span className="font-semibold">{initialCategories.find(c => c.key === typeFilter)?.name}</span>
@@ -455,7 +447,7 @@ export default function StoreSSG({
           </div>
 
           {/* Product Grid */}
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           >
@@ -465,14 +457,11 @@ export default function StoreSSG({
                   variants={itemVariants}
                   whileHover={{ y: -4 }}
                   className="group rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
-                  onMouseEnter={() => setHoveredId(product.id)}
-                  onMouseLeave={() => setHoveredId(null)}
                 >
                   {/* Image Container */}
                   <div className="relative overflow-hidden bg-white h-96">
                     <ProductImage
                       product={product}
-                      isHovered={hoveredId === product.id}
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       priority={index < 8}
                     />
@@ -508,7 +497,7 @@ export default function StoreSSG({
                     <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">
                       {product.name}
                     </h3>
-                    
+
                     {/* Price */}
                     <div className="flex items-center justify-between mb-4">
                       {product.newprice ? (
@@ -527,18 +516,12 @@ export default function StoreSSG({
                       )}
                     </div>
 
-                    {/* Available Sizes - Hidden for bags */}
-                    {product.sizes && product.sizes.length > 0 && product.type?.toLowerCase() !== "bag" && (
+                    {/* Car Specs */}
+                    {product.year && (
                       <div className="flex gap-1 mb-4">
-                        <span className="text-xs text-gray-900 mr-2">Sizes:</span>
-                        {product.sizes.slice(0, 4).map((size, idx) => (
-                          <span
-                            key={idx}
-                            className="text-xs bg-white text-gray-600 px-2 py-1 rounded font-medium"
-                          >
-                            {size}
-                          </span>
-                        ))}
+                        <span className="text-xs text-gray-600">
+                          {product.year} | {product.mileage?.toLocaleString()} km | {product.transmission}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -551,7 +534,7 @@ export default function StoreSSG({
           {filteredProducts.length === 0 && (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No vehicles found</h3>
               <p className="text-gray-600 mb-6">Try adjusting your filters or search terms</p>
               <button
                 onClick={clearAllFilters}

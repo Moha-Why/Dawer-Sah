@@ -179,17 +179,17 @@ export default function DashboardWithRevalidation() {
     >
       {/* Header with Manual Update */}
       <motion.div 
-        className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl p-6 mb-8"
+        className="bg-gradient-to-r from-[#1B2A4A] to-[#2C3E6B] text-white rounded-xl p-6 mb-8"
         variants={revalidationVariants}
       >
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-purple-100">
-              Manage products and update the website manually for optimal performance
+            <h1 className="text-2xl font-bold mb-2">Dawer Sah Admin</h1>
+            <p className="text-blue-100">
+              Manage vehicles and update the website manually for optimal performance
             </p>
             {lastRevalidation && (
-              <p className="text-sm text-purple-200 mt-2">
+              <p className="text-sm text-blue-200 mt-2">
                 Last updated: {lastRevalidation.toLocaleString()}
               </p>
             )}
@@ -198,7 +198,7 @@ export default function DashboardWithRevalidation() {
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Cache Info */}
             {cacheInfo && (
-              <div className="text-sm text-purple-100 bg-white/10 rounded-lg p-3">
+              <div className="text-sm text-blue-100 bg-white/10 rounded-lg p-3">
                 <div>Cache: {cacheInfo.hasCache ? '✅ Active' : '❌ Empty'}</div>
                 {cacheInfo.hasCache && (
                   <div>{cacheInfo.cacheSize} products cached</div>
@@ -213,7 +213,7 @@ export default function DashboardWithRevalidation() {
               className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                 revalidating
                   ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                  : 'bg-white text-purple-600 hover:bg-gray-100'
+                  : 'bg-white text-[#1B2A4A] hover:bg-gray-100'
               }`}
               variants={buttonVariants}
               initial="idle"
@@ -247,7 +247,7 @@ export default function DashboardWithRevalidation() {
         <div className="mt-4 p-4 bg-white/10 rounded-lg">
           <h3 className="font-semibold mb-2">💡 How it works:</h3>
           <div className="text-sm space-y-1">
-            <p>• Add/Edit/Delete products using the tabs below</p>
+            <p>• Add/Edit/Delete vehicles using the tabs below</p>
             <p>• Click "Update Website" to make changes live for visitors</p>
             <p>• The website uses cached data for ultra-fast loading</p>
           </div>
@@ -262,7 +262,7 @@ export default function DashboardWithRevalidation() {
         <motion.button
           className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
             activeTab === "add"
-              ? "bg-purple-600 text-white"
+              ? "bg-[#1B2A4A] text-white"
               : "bg-gray-200 text-gray-800 hover:bg-gray-300"
           }`}
           onClick={() => setActiveTab("add")}
@@ -272,13 +272,13 @@ export default function DashboardWithRevalidation() {
           whileHover="hover"
           whileTap="tap"
         >
-          ➕ Add Product
+          Add Vehicle
         </motion.button>
 
         <motion.button
           className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
             activeTab === "remove"
-              ? "bg-purple-600 text-white"
+              ? "bg-[#1B2A4A] text-white"
               : "bg-gray-200 text-gray-800 hover:bg-gray-300"
           }`}
           onClick={() => setActiveTab("remove")}
@@ -288,7 +288,7 @@ export default function DashboardWithRevalidation() {
           whileHover="hover"
           whileTap="tap"
         >
-          📝 Manage Products
+          Manage Vehicles
         </motion.button>
       </motion.div>
 
@@ -308,15 +308,15 @@ export default function DashboardWithRevalidation() {
       
       {/* Footer Instructions */}
       <motion.div 
-        className="mt-12 p-6 bg-gray-50 rounded-xl border-l-4 border-purple-500"
+        className="mt-12 p-6 bg-gray-50 rounded-xl border-l-4 border-[#1B2A4A]"
         variants={revalidationVariants}
       >
         <h3 className="font-semibold text-gray-900 mb-3">🎯 Performance Tips:</h3>
         <div className="text-sm text-gray-700 space-y-2">
           <p>• This setup minimizes database calls and Vercel function usage</p>
-          <p>• Products are cached in memory for ultra-fast loading</p>
+          <p>• Vehicles are cached in memory for ultra-fast loading</p>
           <p>• Manual updates ensure data consistency and optimal performance</p>
-          <p>• Perfect for Supabase and Vercel free tiers</p>
+          <p>• Perfect for scaling with Vercel deployment</p>
         </div>
       </motion.div>
     </motion.div>

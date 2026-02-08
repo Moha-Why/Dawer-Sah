@@ -38,9 +38,9 @@ export default function LoginPage() {
   return (
     <form
       onSubmit={handleLogin}
-      className="p-6 max-w-sm mx-auto bg-white rounded shadow"
+      className="p-6 max-w-sm mt-8 mx-auto bg-white rounded shadow"
     >
-      <h2 className="text-xl font-bold mb-4">Admin Login</h2>
+      <h2 className="text-xl font-bold mb-4">Dawer Sah Admin</h2>
       <input
         type="email"
         placeholder="Email"
@@ -60,7 +60,7 @@ export default function LoginPage() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-2 bg-purple-600 text-white rounded"
+        className="w-full py-2 bg-[#1B2A4A] text-white rounded hover:bg-[#2C3E6B] transition-colors"
       >
         {loading ? "Logging in..." : "Login"}
       </button>

@@ -64,7 +64,7 @@ export default function Page() {
       </motion.div>
       
       <motion.h1 variants={textVariants}>
-        Your order has been placed and is now under review.
+        Your inquiry has been sent and is now under review.
       </motion.h1>
     </motion.div>
   );

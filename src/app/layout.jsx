@@ -1,5 +1,4 @@
 import "./globals.css";
-import { MyContextProvider } from "../context/CartContext";
 import { Outfit } from "next/font/google";
 import Footer from "./Footer";
 import ClientLayoutWrapper from "./ClientLayoutWrapper";
@@ -11,8 +10,8 @@ const outfit = Outfit({
 });
 
 export const metadata = {
-  title: "Wn Store",
-  description: "Shop the latest collection of elegant dresses – evening gowns, casual styles & chic outfits. High-quality fabrics, affordable prices & fast delivery.",
+  title: "Dawer Sah - Used Cars for Sale",
+  description: "Find quality pre-owned vehicles at Dawer Sah. Wide selection of sedans, SUVs, trucks and more. Fair prices and trusted service.",
   icons: { icon: "/favicon.ico" },
 };
 
@@ -22,12 +21,10 @@ export default function RootLayout({ children }) {
       <body className={`${outfit.className} antialiased flex flex-col min-h-screen`}>
         <link rel="icon" href="/favicon.ico" />
         <Analytics />
-        <MyContextProvider>
-          <ClientLayoutWrapper className="flex-grow">
-            {children}
-          </ClientLayoutWrapper>
-          <Footer />
-        </MyContextProvider>
+        <ClientLayoutWrapper className="flex-grow">
+          {children}
+        </ClientLayoutWrapper>
+        <Footer />
       </body>
     </html>
   );

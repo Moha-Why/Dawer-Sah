@@ -12,7 +12,7 @@ export default function AdminDashboard() {
  * Metadata للصفحة
  */
 export const metadata = {
-  title: "Admin Dashboard - Wn Store",
+  title: "Admin Dashboard - Dawer Sah",
   description: "Admin panel for managing products and website content",
   robots: "noindex, nofollow", // منع indexing للصفحة الإدارية
 }

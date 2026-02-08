@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { useMyContext } from "../../../context/CartContext"
 import { motion, AnimatePresence } from "framer-motion"
 import toast from "react-hot-toast"
 import Image from "next/image"
@@ -21,9 +20,9 @@ const containerVariants = {
 }
 
 const itemVariants = {
-  hidden: { 
-    opacity: 0, 
-    y: 20 
+  hidden: {
+    opacity: 0,
+    y: 20
   },
   visible: {
     opacity: 1,
@@ -44,47 +43,20 @@ const buttonVariants = {
   tap: { scale: 0.98 }
 }
 
-// Hex mapping for non-standard CSS color names
+// Hex mapping for car color names
 const colorHexMap = {
-  "rose gold": "#B76E79",
-  "blush pink": "#F4C2C2",
-  "coral": "#FF7F50",
-  "dusty rose": "#DCAE96",
-  "mauve": "#E0B0FF",
-  "burgundy": "#800020",
-  "wine": "#722F37",
-  "champagne": "#F7E7CE",
-  "ivory": "#FFFFF0",
-  "cream": "#FFFDD0",
-  "nude": "#E3BC9A",
-  "camel": "#C19A6B",
-  "tan": "#D2B48C",
-  "taupe": "#483C32",
-  "khaki": "#C3B091",
-  "mint": "#98FF98",
-  "sage": "#BCB88A",
-  "emerald": "#50C878",
+  "pearl white": "#F5F5F0",
+  "metallic gray": "#8E8E8E",
+  "champagne gold": "#F7E7CE",
+  "midnight blue": "#191970",
+  "racing red": "#FF0000",
   "forest green": "#228B22",
-  "lavender": "#E6E6FA",
-  "lilac": "#C8A2C8",
-  "periwinkle": "#CCCCFF",
-  "cobalt": "#0047AB",
-  "powder blue": "#B0E0E6",
-  "baby blue": "#89CFF0",
-  "rust": "#B7410E",
-  "terracotta": "#E2725B",
-  "peach": "#FFCBA4",
-  "apricot": "#FBCEB1",
-  "mustard": "#FFDB58",
-  "off white": "#FAF9F6",
+  "deep black": "#0A0A0A",
+  "silver": "#C0C0C0",
   "charcoal": "#36454F",
-  "hot pink": "#FF69B4",
-  "crimson": "#DC143C",
-  "copper": "#B87333",
   "bronze": "#CD7F32",
-  "plum": "#8E4585",
-  "seafoam": "#93E9BE",
-  "sky blue": "#87CEEB",
+  "navy": "#000080",
+  "maroon": "#800000",
 }
 const getColorValue = (color) => colorHexMap[color] || color
 
@@ -93,13 +65,9 @@ export default function ProductDetailClient({
   initialProduct,
   initialRelatedProducts = []
 }) {
-  const { addToCart } = useMyContext()
   const [product, setProduct] = useState(initialProduct)
   const [selectedColor, setSelectedColor] = useState("")
-  const [selectedSize, setSelectedSize] = useState("")
-  const [quantity, setQuantity] = useState(1)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
-  const [loading, setLoading] = useState(false)
 
   // Compute images to display based on selected color
   const currentImages = useMemo(() => {
@@ -109,68 +77,54 @@ export default function ProductDetailClient({
     return product?.pictures || []
   }, [product, selectedColor])
 
-  // Initialize selected color and size
+  // Initialize selected color
   useEffect(() => {
     if (product) {
       if (product.colors && product.colors.length > 0 && !selectedColor) {
         setSelectedColor(product.colors[0])
       }
-      if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-        setSelectedSize(product.sizes[0])
-      }
     }
-  }, [product, selectedColor, selectedSize])
+  }, [product, selectedColor])
 
   const handleColorSelect = (color) => {
     setSelectedColor(color)
     setActiveImageIndex(0)
   }
 
-  // Handle add to cart
-  const handleAddToCart = async () => {
+  // Handle WhatsApp inquiry for this vehicle
+  const handleWhatsAppInquiry = () => {
     if (!product) return
 
-    // Validation
-    if (product.colors && product.colors.length > 0 && !selectedColor) {
-      toast.error("Please select a color")
-      return
+    const currentPrice = product.newprice || product.price
+    const hasDiscount = product.newprice && product.newprice < product.price
+
+    let message = `🚗 *Dawer Sah - Vehicle Inquiry*\n\n`
+    message += `*Vehicle:* ${product.name}\n`
+    if (product.brand) message += `*Brand:* ${product.brand}\n`
+    if (product.year) message += `*Year:* ${product.year}\n`
+    if (product.mileage) message += `*Mileage:* ${product.mileage.toLocaleString()} km\n`
+    if (product.transmission) message += `*Transmission:* ${product.transmission}\n`
+    if (product.fuelType) message += `*Fuel Type:* ${product.fuelType}\n`
+    if (product.engineSize) message += `*Engine:* ${product.engineSize}\n`
+    if (selectedColor) message += `*Color:* ${selectedColor}\n`
+    if (hasDiscount) {
+      message += `*Price:* ${currentPrice.toLocaleString()} EGP (was ${product.price.toLocaleString()} EGP)\n`
+    } else {
+      message += `*Price:* ${currentPrice.toLocaleString()} EGP\n`
     }
+    message += `\nI'm interested in this vehicle. Please provide more details.`
 
-    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-      toast.error("Please select a size")
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      const productToAdd = {
-        ...product,
-        selectedColor,
-        selectedSize,
-        quantity
-      }
-
-      await addToCart(productToAdd)
-      toast.success(`Added ${quantity}x ${product.name} to cart!`)
-
-      // Reset quantity
-      setQuantity(1)
-      
-    } catch (error) {
-      console.error("Error adding to cart:", error)
-      toast.error("Failed to add to cart. Please try again.")
-    } finally {
-      setLoading(false)
-    }
+    const whatsappNumber = "20XXXXXXXXXX"
+    const encodedMessage = encodeURIComponent(message)
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, "_blank")
   }
 
   if (!product) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h1>
-          <p className="text-gray-600">The product you're looking for doesn't exist.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Vehicle Not Found</h1>
+          <p className="text-gray-600">The vehicle you're looking for doesn't exist.</p>
         </div>
       </div>
     )
@@ -179,7 +133,7 @@ export default function ProductDetailClient({
   const currentPrice = product.newprice || product.price
   const originalPrice = product.price
   const hasDiscount = product.newprice && product.newprice < product.price
-  const discountPercentage = hasDiscount 
+  const discountPercentage = hasDiscount
     ? Math.round(((originalPrice - product.newprice) / originalPrice) * 100)
     : 0
 
@@ -192,27 +146,27 @@ export default function ProductDetailClient({
       suppressHydrationWarning
     >
       {/* Breadcrumb */}
-      <motion.nav 
+      <motion.nav
         className="mb-8 text-sm text-gray-600"
         variants={itemVariants}
       >
-        <span>Home</span> / <span>Products</span> / <span className="text-gray-900">{product.name}</span>
+        <span>Home</span> / <span>Vehicles</span> / <span className="text-gray-900">{product.name}</span>
       </motion.nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-        {/* Product Images - Fixed without Swiper for SSR compatibility */}
+        {/* Product Images */}
         <motion.div variants={itemVariants} className="space-y-4">
           {/* Main Image Display */}
           <div className="relative rounded-2xl overflow-hidden bg-white aspect-[4/5] w-full">
             <Image
-              src={currentImages[activeImageIndex] || currentImages[0] || 'https://dfurfmrwpyotjfrryatn.supabase.co/storage/v1/object/public/product-images/casual.png'}
+              src={currentImages[activeImageIndex] || currentImages[0] || '/fallback.png'}
               alt={`${product.name} - Image ${activeImageIndex + 1}`}
               fill
               className="object-cover"
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
               onError={(e) => {
-                e.target.src = 'https://dfurfmrwpyotjfrryatn.supabase.co/storage/v1/object/public/product-images/casual.png'
+                e.target.src = '/fallback.png'
               }}
             />
 
@@ -271,8 +225,8 @@ export default function ProductDetailClient({
                 <motion.button
                   key={index}
                   className={`flex-shrink-0 w-20 h-24 rounded-lg overflow-hidden border-2 transition-colors ${
-                    activeImageIndex === index 
-                      ? 'border-black' 
+                    activeImageIndex === index
+                      ? 'border-black'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                   onClick={() => setActiveImageIndex(index)}
@@ -286,7 +240,7 @@ export default function ProductDetailClient({
                     height={96}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.target.src = 'https://dfurfmrwpyotjfrryatn.supabase.co/storage/v1/object/public/product-images/casual.png'
+                      e.target.src = '/fallback.png'
                     }}
                   />
                 </motion.button>
@@ -308,15 +262,15 @@ export default function ProductDetailClient({
           {/* Price */}
           <div className="flex items-center gap-3">
             <span className="text-3xl font-bold text-gray-900">
-              {currentPrice} LE
+              {currentPrice?.toLocaleString()} EGP
             </span>
             {hasDiscount && (
               <>
                 <span className="text-xl text-gray-500 line-through">
-                  {originalPrice} LE
+                  {originalPrice?.toLocaleString()} EGP
                 </span>
                 <span className="bg text-white px-2 py-1 rounded text-sm font-medium">
-                  Save {originalPrice - product.newprice} LE
+                  Save {(originalPrice - product.newprice)?.toLocaleString()} EGP
                 </span>
               </>
             )}
@@ -326,6 +280,66 @@ export default function ProductDetailClient({
           {product.description && (
             <div className="prose prose-gray max-w-none">
               <p className="text-gray-700">{product.description}</p>
+            </div>
+          )}
+
+          {/* Vehicle Specs */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-gray-900">Vehicle Specifications</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {product.year && (
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <span className="block text-xs text-gray-500 uppercase tracking-wide mb-1">Year</span>
+                  <span className="block text-sm font-semibold text-gray-900">{product.year}</span>
+                </div>
+              )}
+              {product.mileage != null && (
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <span className="block text-xs text-gray-500 uppercase tracking-wide mb-1">Mileage</span>
+                  <span className="block text-sm font-semibold text-gray-900">{product.mileage?.toLocaleString()} km</span>
+                </div>
+              )}
+              {product.transmission && (
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <span className="block text-xs text-gray-500 uppercase tracking-wide mb-1">Transmission</span>
+                  <span className="block text-sm font-semibold text-gray-900">{product.transmission}</span>
+                </div>
+              )}
+              {product.fuelType && (
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <span className="block text-xs text-gray-500 uppercase tracking-wide mb-1">Fuel Type</span>
+                  <span className="block text-sm font-semibold text-gray-900">{product.fuelType}</span>
+                </div>
+              )}
+              {product.engineSize && (
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <span className="block text-xs text-gray-500 uppercase tracking-wide mb-1">Engine</span>
+                  <span className="block text-sm font-semibold text-gray-900">{product.engineSize}</span>
+                </div>
+              )}
+              {product.brand && (
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <span className="block text-xs text-gray-500 uppercase tracking-wide mb-1">Brand</span>
+                  <span className="block text-sm font-semibold text-gray-900">{product.brand}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Features List */}
+          {product.features && product.features.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-gray-900">Features</h3>
+              <div className="flex flex-wrap gap-2">
+                {product.features.map((feature, index) => (
+                  <span
+                    key={index}
+                    className="inline-block bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded-full border border-gray-200"
+                  >
+                    {feature}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
 
@@ -340,8 +354,8 @@ export default function ProductDetailClient({
                   <motion.button
                     key={color}
                     className={`w-12 h-12 rounded-full border-4 transition-all ${
-                      selectedColor === color 
-                        ? 'border-black shadow-lg' 
+                      selectedColor === color
+                        ? 'border-black shadow-lg'
                         : 'border-gray-300 hover:border-gray-400'
                     }`}
                     style={{ backgroundColor: getColorValue(color) }}
@@ -356,115 +370,51 @@ export default function ProductDetailClient({
             </div>
           )}
 
-          {/* Size Selection */}
-          {product.sizes && product.sizes.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Size: <span className="font-normal">{selectedSize}</span>
-              </h3>
-              <div className="flex gap-2 flex-wrap">
-                {product.sizes.map((size) => (
-                  <motion.button
-                    key={size}
-                    className={`px-4 py-2 rounded-lg border-2 font-medium transition-all ${
-                      selectedSize === size
-                        ? 'border-black bg-black text-white'
-                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                    }`}
-                    onClick={() => setSelectedSize(size)}
-                    variants={buttonVariants}
-                    initial="idle"
-                    whileHover="hover"
-                    whileTap="tap"
-                  >
-                    {size}
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Quantity */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-900">Quantity</h3>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center border border-gray-300 rounded-lg">
-                <motion.button
-                  className="px-4 py-2 hover:bg-white transition-colors"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  -
-                </motion.button>
-                <span className="px-4 py-2 font-medium">{quantity}</span>
-                <motion.button
-                  className="px-4 py-2 hover:bg-white transition-colors"
-                  onClick={() => setQuantity(quantity + 1)}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  +
-                </motion.button>
-              </div>
-            </div>
-          </div>
-
-          {/* Add to Cart */}
+          {/* WhatsApp Inquiry Button */}
           <div className="space-y-4 pt-6">
             <motion.button
-              className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all ${
-                loading
-                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                  : 'bg-black text-white hover:bg-gray-800'
-              }`}
-              onClick={handleAddToCart}
-              disabled={loading}
+              className="w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all bg-green-600 text-white hover:bg-green-700"
+              onClick={handleWhatsAppInquiry}
               variants={buttonVariants}
               initial="idle"
-              whileHover={!loading ? "hover" : {}}
-              whileTap={!loading ? "tap" : {}}
+              whileHover="hover"
+              whileTap="tap"
             >
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={loading ? "loading" : "idle"}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <motion.div
-                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      />
-                      Adding to Cart...
-                    </>
-                  ) : (
-                    `Add to Cart - ${(currentPrice * quantity).toLocaleString()} LE`
-                  )}
-                </motion.span>
-              </AnimatePresence>
+              <span className="flex items-center justify-center gap-2">
+                Inquire via WhatsApp - {currentPrice?.toLocaleString()} EGP
+              </span>
             </motion.button>
 
-            {/* Product Features */}
+            <motion.button
+              className="w-full py-3 px-6 rounded-lg font-semibold text-lg transition-all bg-[#1B2A4A] text-white hover:bg-[#2C3E6B]"
+              onClick={() => window.open("tel:+20XXXXXXXXXX")}
+              variants={buttonVariants}
+              initial="idle"
+              whileHover="hover"
+              whileTap="tap"
+            >
+              <span className="flex items-center justify-center gap-2">
+                Call Us About This Vehicle
+              </span>
+            </motion.button>
+
+            {/* Car Benefits */}
             <div className="grid grid-cols-2 gap-4 pt-4 text-sm text-gray-600">
               <div className="flex items-center gap-2">
-                <span>✨</span>
-                <span>High Quality</span>
+                <span>&#128736;</span>
+                <span>Full Service History</span>
               </div>
               <div className="flex items-center gap-2">
-                <span>🚚</span>
-                <span>Fast Delivery</span>
+                <span>&#128663;</span>
+                <span>Test Drive Available</span>
               </div>
               <div className="flex items-center gap-2">
-                <span>💯</span>
-                <span>Authentic</span>
+                <span>&#9989;</span>
+                <span>Certified Pre-Owned</span>
               </div>
               <div className="flex items-center gap-2">
-                <span>🔄</span>
-                <span>Easy Returns</span>
+                <span>&#128260;</span>
+                <span>Trade-In Welcome</span>
               </div>
             </div>
           </div>
@@ -472,7 +422,7 @@ export default function ProductDetailClient({
       </div>
 
       {/* Related Products */}
-      <RelatedProducts currentProduct={product} />
+      <RelatedProducts currentProduct={product} initialRelated={initialRelatedProducts} />
     </motion.div>
   )
 }

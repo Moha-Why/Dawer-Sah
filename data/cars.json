@@ -1,0 +1,247 @@
+[
+  {
+    "id": 1,
+    "name": "Toyota Camry 2020",
+    "brand": "Toyota",
+    "type": "sedan",
+    "year": 2020,
+    "mileage": 45000,
+    "transmission": "Automatic",
+    "fuelType": "Gasoline",
+    "engineSize": "2.5L",
+    "price": 450000,
+    "newprice": 420000,
+    "colors": ["white", "silver"],
+    "pictures": [
+      "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&h=600&fit=crop"
+    ],
+    "color_images": {
+      "white": ["https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=800&h=600&fit=crop"],
+      "silver": ["https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&h=600&fit=crop"]
+    },
+    "description": "Well-maintained Toyota Camry with full service history. Single owner, accident-free. Excellent fuel economy and reliability.",
+    "features": ["Cruise Control", "Bluetooth", "Backup Camera", "Leather Seats", "Sunroof"]
+  },
+  {
+    "id": 2,
+    "name": "BMW X5 2019",
+    "brand": "BMW",
+    "type": "suv",
+    "year": 2019,
+    "mileage": 62000,
+    "transmission": "Automatic",
+    "fuelType": "Gasoline",
+    "engineSize": "3.0L",
+    "price": 950000,
+    "newprice": null,
+    "colors": ["black", "white"],
+    "pictures": [
+      "https://images.unsplash.com/photo-1556189250-72ba954cfc2b?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&h=600&fit=crop"
+    ],
+    "color_images": {
+      "black": ["https://images.unsplash.com/photo-1556189250-72ba954cfc2b?w=800&h=600&fit=crop"],
+      "white": ["https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&h=600&fit=crop"]
+    },
+    "description": "Luxury BMW X5 with panoramic sunroof, premium sound system, and advanced driver assistance. Well-maintained with regular BMW service.",
+    "features": ["Panoramic Sunroof", "Premium Sound", "Navigation", "Heated Seats", "Parking Sensors", "360 Camera"]
+  },
+  {
+    "id": 3,
+    "name": "Mercedes-Benz C200 2021",
+    "brand": "Mercedes",
+    "type": "sedan",
+    "year": 2021,
+    "mileage": 28000,
+    "transmission": "Automatic",
+    "fuelType": "Gasoline",
+    "engineSize": "2.0L",
+    "price": 850000,
+    "newprice": 799000,
+    "colors": ["black", "silver", "white"],
+    "pictures": [
+      "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&h=600&fit=crop"
+    ],
+    "color_images": {
+      "black": ["https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=600&fit=crop"],
+      "silver": ["https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&h=600&fit=crop"],
+      "white": ["https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=600&fit=crop"]
+    },
+    "description": "Elegant Mercedes-Benz C200 with AMG styling package. Low mileage, single owner, full dealer service history.",
+    "features": ["AMG Package", "Digital Dashboard", "Ambient Lighting", "Apple CarPlay", "Blind Spot Monitor"]
+  },
+  {
+    "id": 4,
+    "name": "Honda Civic 2022",
+    "brand": "Honda",
+    "type": "sedan",
+    "year": 2022,
+    "mileage": 15000,
+    "transmission": "Automatic",
+    "fuelType": "Gasoline",
+    "engineSize": "1.5L Turbo",
+    "price": 520000,
+    "newprice": null,
+    "colors": ["red", "black", "blue"],
+    "pictures": [
+      "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1590362891991-f776e747a588?w=800&h=600&fit=crop"
+    ],
+    "color_images": {
+      "red": ["https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&h=600&fit=crop"],
+      "black": ["https://images.unsplash.com/photo-1590362891991-f776e747a588?w=800&h=600&fit=crop"],
+      "blue": ["https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&h=600&fit=crop"]
+    },
+    "description": "Nearly new Honda Civic with turbo engine. Sporty design with excellent fuel efficiency. Still under manufacturer warranty.",
+    "features": ["Turbo Engine", "Honda Sensing", "Lane Keep Assist", "Adaptive Cruise Control", "LED Headlights"]
+  },
+  {
+    "id": 5,
+    "name": "Hyundai Tucson 2021",
+    "brand": "Hyundai",
+    "type": "suv",
+    "year": 2021,
+    "mileage": 35000,
+    "transmission": "Automatic",
+    "fuelType": "Gasoline",
+    "engineSize": "2.0L",
+    "price": 580000,
+    "newprice": 550000,
+    "colors": ["gray", "white", "blue"],
+    "pictures": [
+      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=600&fit=crop"
+    ],
+    "color_images": {
+      "gray": ["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop"],
+      "white": ["https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=600&fit=crop"],
+      "blue": ["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop"]
+    },
+    "description": "Modern Hyundai Tucson with bold design. Spacious interior, advanced safety features, and great value for money.",
+    "features": ["Smart Key", "Apple CarPlay", "Android Auto", "Rear Camera", "Wireless Charging"]
+  },
+  {
+    "id": 6,
+    "name": "Kia Sportage 2020",
+    "brand": "Kia",
+    "type": "suv",
+    "year": 2020,
+    "mileage": 52000,
+    "transmission": "Automatic",
+    "fuelType": "Gasoline",
+    "engineSize": "2.0L",
+    "price": 480000,
+    "newprice": null,
+    "colors": ["white", "red"],
+    "pictures": [
+      "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&h=600&fit=crop"
+    ],
+    "color_images": {
+      "white": ["https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&h=600&fit=crop"],
+      "red": ["https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&h=600&fit=crop"]
+    },
+    "description": "Reliable Kia Sportage with comfortable ride. Perfect family SUV with generous cargo space and modern tech features.",
+    "features": ["Bluetooth", "Rear Camera", "Parking Sensors", "Cruise Control", "Alloy Wheels"]
+  },
+  {
+    "id": 7,
+    "name": "Toyota Hilux 2019",
+    "brand": "Toyota",
+    "type": "truck",
+    "year": 2019,
+    "mileage": 78000,
+    "transmission": "Manual",
+    "fuelType": "Diesel",
+    "engineSize": "2.8L",
+    "price": 650000,
+    "newprice": null,
+    "colors": ["white", "gray"],
+    "pictures": [
+      "https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&h=600&fit=crop"
+    ],
+    "color_images": {
+      "white": ["https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=800&h=600&fit=crop"],
+      "gray": ["https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&h=600&fit=crop"]
+    },
+    "description": "Tough and dependable Toyota Hilux diesel. Ready for work and adventure. Strong towing capacity and off-road capability.",
+    "features": ["4WD", "Diesel Engine", "Tow Bar", "Bull Bar", "Bed Liner"]
+  },
+  {
+    "id": 8,
+    "name": "Hyundai Elantra 2022",
+    "brand": "Hyundai",
+    "type": "sedan",
+    "year": 2022,
+    "mileage": 18000,
+    "transmission": "Automatic",
+    "fuelType": "Gasoline",
+    "engineSize": "1.6L",
+    "price": 420000,
+    "newprice": 399000,
+    "colors": ["gray", "black", "white"],
+    "pictures": [
+      "https://images.unsplash.com/photo-1542362567-b07e54358753?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&h=600&fit=crop"
+    ],
+    "color_images": {
+      "gray": ["https://images.unsplash.com/photo-1542362567-b07e54358753?w=800&h=600&fit=crop"],
+      "black": ["https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&h=600&fit=crop"],
+      "white": ["https://images.unsplash.com/photo-1542362567-b07e54358753?w=800&h=600&fit=crop"]
+    },
+    "description": "Stylish Hyundai Elantra with futuristic design. Excellent fuel economy, packed with technology. Like new condition.",
+    "features": ["Smart Cruise Control", "10.25\" Display", "Wireless CarPlay", "LED Lights", "Digital Key"]
+  },
+  {
+    "id": 9,
+    "name": "BMW 320i 2020",
+    "brand": "BMW",
+    "type": "sedan",
+    "year": 2020,
+    "mileage": 40000,
+    "transmission": "Automatic",
+    "fuelType": "Gasoline",
+    "engineSize": "2.0L Turbo",
+    "price": 780000,
+    "newprice": null,
+    "colors": ["black", "blue"],
+    "pictures": [
+      "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1520050206757-308e44010cfe?w=800&h=600&fit=crop"
+    ],
+    "color_images": {
+      "black": ["https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=600&fit=crop"],
+      "blue": ["https://images.unsplash.com/photo-1520050206757-308e44010cfe?w=800&h=600&fit=crop"]
+    },
+    "description": "Sporty BMW 320i with M Sport package. Dynamic driving experience with premium comfort. Full BMW service history.",
+    "features": ["M Sport Package", "Live Cockpit", "Harman Kardon", "Sport Seats", "Ambient Lighting"]
+  },
+  {
+    "id": 10,
+    "name": "Honda HR-V 2021",
+    "brand": "Honda",
+    "type": "hatchback",
+    "year": 2021,
+    "mileage": 25000,
+    "transmission": "Automatic",
+    "fuelType": "Gasoline",
+    "engineSize": "1.8L",
+    "price": 450000,
+    "newprice": null,
+    "colors": ["white", "gray", "black"],
+    "pictures": [
+      "/honda_hr.png",
+      "https://images.unsplash.com/photo-1617469767053-d3b523a0b982?w=800&h=600&fit=crop"
+    ],
+    "color_images": {
+      "white": ["/honda_hr.png"],
+      "gray": ["https://images.unsplash.com/photo-1617469767053-d3b523a0b982?w=800&h=600&fit=crop"],
+      "black": ["/honda_hr.png"]
+    },
+    "description": "Versatile Honda HR-V with Magic Seats. Compact outside, spacious inside. Perfect city car with Honda reliability.",
+    "features": ["Magic Seats", "Honda Sensing", "LED DRL", "Push Start", "Multi-Angle Camera"]
+  }
+]

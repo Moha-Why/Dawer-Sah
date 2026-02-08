@@ -80,12 +80,12 @@ export default async function Home() {
  * Enhanced Metadata for SEO
  */
 export const metadata = {
-  title: "Wn Store - Latest Fashion Collection",
-  description: "Shop the latest collection of elegant dresses, casual styles & chic outfits. High-quality fabrics, affordable prices & fast delivery in Egypt.",
-  keywords: "fashion, dresses, casual wear, bags, online shopping, Egypt, women clothing",
-  authors: [{ name: "Wn Store" }],
-  creator: "Wn Store",
-  publisher: "Wn Store",
+  title: "Dawer Sah - Quality Used Cars for Sale",
+  description: "Find your perfect pre-owned vehicle at Dawer Sah. Wide selection of sedans, SUVs, trucks and more from top brands. Fair prices and trusted service.",
+  keywords: "used cars, pre-owned vehicles, cars for sale, sedans, SUVs, trucks, Toyota, BMW, Mercedes, Honda, Hyundai",
+  authors: [{ name: "Dawer Sah" }],
+  creator: "Dawer Sah",
+  publisher: "Dawer Sah",
   robots: {
     index: true,
     follow: true,
@@ -100,29 +100,25 @@ export const metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://wn-store.vercel.app",
-    siteName: "Wn Store",
-    title: "Wn Store - Latest Fashion Collection",
-    description: "Shop the latest collection of elegant dresses, casual styles & chic outfits.",
+    siteName: "Dawer Sah",
+    title: "Dawer Sah - Quality Used Cars for Sale",
+    description: "Find your perfect pre-owned vehicle at Dawer Sah.",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Wn Store Fashion Collection",
+        alt: "Dawer Sah - Used Cars",
         type: "image/jpeg"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Wn Store - Latest Fashion Collection",
-    description: "Shop the latest collection of elegant dresses, casual styles & chic outfits.",
+    title: "Dawer Sah - Quality Used Cars for Sale",
+    description: "Find your perfect pre-owned vehicle at Dawer Sah.",
     images: ["/og-image.jpg"],
-    creator: "@wnstore"
-  },
-  alternates: {
-    canonical: "https://wn-store.vercel.app"
+    creator: "@dawersah"
   }
 }
 

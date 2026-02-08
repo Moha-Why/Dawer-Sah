@@ -35,16 +35,16 @@ body {
 }
 
 .bg{
-  background-color: #b09dc1; /* إزالة الشفافية */
+  background-color: #1B2A4A;
 }
 
 .bgg{
-  color: #b09dc1;
+  color: #1B2A4A;
 }
 
 .nava {
-  background: #B09DC1;
-  background: linear-gradient(270deg, rgba(176, 157, 193, 1) 32%, rgba(255, 255, 255, 0.84) 71%);
+  background: #1B2A4A;
+  background: linear-gradient(270deg, rgba(27, 42, 74, 1) 32%, rgba(44, 62, 107, 0.84) 71%);
 }
 
 .swiper-button-next,
