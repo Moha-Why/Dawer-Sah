@@ -169,9 +169,9 @@ export default function RelatedProducts({ currentProduct, initialRelated = [] })
                 </div>
               )}
 
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col mb-4">
                 {product.newprice ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col">
                     <span className="text-lg font-semibold text-gray-900">
                       {product.newprice} EGP
                     </span>

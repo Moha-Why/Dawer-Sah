@@ -168,8 +168,8 @@ export default function StoreSSG({
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">Our Inventory</h1>
-          <p className="text-xl text-gray-600 mb-8">Browse quality pre-owned vehicles</p>
+          <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-4">Our Inventory</h1>
+          <p className="text-base sm:text-xl text-gray-600 mb-8">Browse quality pre-owned vehicles</p>
 
           {/* Search Bar */}
           <div className="max-w-md mx-auto relative">
@@ -195,7 +195,7 @@ export default function StoreSSG({
                 <span className="text-lg font-bold  text-black">SPECIAL DEALS</span>
                 <FaFire className="text-xl text-black" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Best Offers</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Best Offers</h2>
               <p className="text-gray-600">Special prices on selected vehicles</p>
             </motion.div>
 
@@ -214,7 +214,7 @@ export default function StoreSSG({
                     </div>
 
                     {/* Image */}
-                    <div className="relative overflow-hidden bg-white h-96">
+                    <div className="relative overflow-hidden bg-white h-64 sm:h-96">
                       <ProductImage
                         product={product}
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -228,7 +228,7 @@ export default function StoreSSG({
                         {product.name}
                       </h3>
 
-                      <div className="flex items-center gap-2 mb-3">
+                      <div className="flex flex-col mb-3">
                         <span className="text-lg font-bold text">
                           {product.newprice} LE
                         </span>
@@ -250,7 +250,7 @@ export default function StoreSSG({
 
         {/* Categories Section */}
         <motion.div variants={containerVariants} className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Browse by Type</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-8">Browse by Type</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {initialCategories.map((category) => (
@@ -262,7 +262,7 @@ export default function StoreSSG({
                 className="relative group cursor-pointer overflow-hidden rounded-2xl shadow-lg"
                 onClick={() => handleCategoryClick(category.key)}
               >
-                <div className="relative h-80 overflow-hidden">
+                <div className="relative h-52 md:h-80 overflow-hidden">
                   <Image
                     src={category.image}
                     alt={category.name}
@@ -459,7 +459,7 @@ export default function StoreSSG({
                   className="group rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
                 >
                   {/* Image Container */}
-                  <div className="relative overflow-hidden bg-white h-96">
+                  <div className="relative overflow-hidden bg-white h-64 sm:h-96">
                     <ProductImage
                       product={product}
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -499,9 +499,9 @@ export default function StoreSSG({
                     </h3>
 
                     {/* Price */}
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex flex-col mb-4">
                       {product.newprice ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col">
                           <span className="text-lg font-semibold text-gray-900">
                             {product.newprice} LE
                           </span>

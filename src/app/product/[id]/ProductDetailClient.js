@@ -153,7 +153,7 @@ export default function ProductDetailClient({
         <span>Home</span> / <span>Vehicles</span> / <span className="text-gray-900">{product.name}</span>
       </motion.nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 mb-16">
         {/* Product Images */}
         <motion.div variants={itemVariants} className="space-y-4">
           {/* Main Image Display */}
@@ -253,26 +253,26 @@ export default function ProductDetailClient({
         <motion.div variants={itemVariants} className="space-y-6">
           {/* Product Name */}
           <div>
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
               {product.name}
             </h1>
             <p className="text-gray-600 capitalize">{product.type}</p>
           </div>
 
           {/* Price */}
-          <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-gray-900">
+          <div className="flex flex-col gap-1">
+            <span className="text-2xl sm:text-3xl font-bold text-gray-900">
               {currentPrice?.toLocaleString()} EGP
             </span>
             {hasDiscount && (
-              <>
-                <span className="text-xl text-gray-500 line-through">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-lg text-gray-500 line-through">
                   {originalPrice?.toLocaleString()} EGP
                 </span>
                 <span className="bg text-white px-2 py-1 rounded text-sm font-medium">
                   Save {(originalPrice - product.newprice)?.toLocaleString()} EGP
                 </span>
-              </>
+              </div>
             )}
           </div>
 
