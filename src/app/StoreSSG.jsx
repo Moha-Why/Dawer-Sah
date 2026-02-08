@@ -191,9 +191,9 @@ export default function StoreSSG({
           <motion.div variants={containerVariants} className="mb-16">
             <motion.div variants={itemVariants} className="text-center mb-8">
               <div className="inline-flex items-center gap-3 bg text-white px-6 py-3 rounded-full mb-4">
-                <FaFire className="text-xl text-black" />
-                <span className="text-lg font-bold  text-black">SPECIAL DEALS</span>
-                <FaFire className="text-xl text-black" />
+                <FaFire className="text-xl text-white" />
+                <span className="text-lg font-bold text-white">SPECIAL DEALS</span>
+                <FaFire className="text-xl text-white" />
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Best Offers</h2>
               <p className="text-gray-600">Special prices on selected vehicles</p>
@@ -208,7 +208,7 @@ export default function StoreSSG({
                     className="group rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 relative cursor-pointer"
                   >
                     {/* Hot Deal Badge */}
-                    <div className="absolute top-3 left-3 bg text-black px-3 py-1 rounded-full text-xs font-bold z-10 flex items-center gap-1">
+                    <div className="absolute top-3 left-3 bg text-white px-3 py-1 rounded-full text-xs font-bold z-10 flex items-center gap-1">
                       <FaFire className="text-xs" />
                       {getDiscountPercentage(product.price, product.newprice)}% OFF
                     </div>
@@ -237,7 +237,7 @@ export default function StoreSSG({
                         </span>
                       </div>
 
-                      <div className="w-full bg text-black py-2 rounded-lg text-center text-sm font-medium transition-all">
+                      <div className="w-full bg text-white py-2 rounded-lg text-center text-sm font-medium transition-all">
                         View Details
                       </div>
                     </div>
@@ -468,7 +468,7 @@ export default function StoreSSG({
 
                     {/* Sale Badge */}
                     {product.newprice && (
-                      <div className="absolute top-3 left-3 bg text-black px-3 py-1 rounded-full text-xs font-bold">
+                      <div className="absolute top-3 left-3 bg text-white px-3 py-1 rounded-full text-xs font-bold">
                         SALE
                       </div>
                     )}
